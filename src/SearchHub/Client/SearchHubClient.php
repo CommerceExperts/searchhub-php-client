@@ -26,6 +26,7 @@ class SearchHubClient implements SearchHubClientInterface
 
     protected function optimize(SearchHubRequest $searchHubRequest)
     {
+        $startTimestamp = microtime(true);
         $mappings = $this->loadMappings(SearchHubConstants::MAPPING_QUERIES_ENDPOINT );
         if (isset($mappings[$searchHubRequest->getUserQuery()]) ) {
             $mapping = $mappings[$searchHubRequest->getUserQuery()];
@@ -38,12 +39,23 @@ class SearchHubClient implements SearchHubClientInterface
                     //TODO: log
                     header('Location: ' . SearchHubConstants::REDIRECTS_BASE_URL . $mapping["redirect"]);
                 }
+                $this->report(
+                    $searchHubRequest->getUserQuery(),
+                    $mapping["masterQuery"],
+                    microtime(true) - $startTimestamp,
+                    true
+                );
                 exit;
             }
             else {
                 //TODO: log
-                //TODO: optional: implement async back-channel for searchhub statistics
                 $searchHubRequest->setSearchQuery($mapping["masterQuery"]);
+                $this->report(
+                    $searchHubRequest->getUserQuery(),
+                    $mapping["masterQuery"],
+                    microtime(true) - $startTimestamp,
+                    false
+                );
             }
             return $searchHubRequest;
         }
@@ -129,5 +141,65 @@ class SearchHubClient implements SearchHubClientInterface
             }
         }
         return $indexedMappings;
+    }
+
+
+    /**
+    * @param string $originalSearchString
+    * @param string $optimizedSearchString
+    * @param float $duration
+    * @param bool $redirect
+    *
+    * @return void
+    */
+    protected function report(
+            string $originalSearchString,
+            string $optimizedSearchString,
+            float $duration,
+            bool $redirect
+        ): void {
+        $event = sprintf(
+            '[
+                {
+                    "from": "%s",
+                    "to": "%s",
+                    "redirect": "%s",
+                    "durationNs": %d,
+                    "tenant": {
+                        "name": "%s",
+                        "channel": "%s"
+                    },
+                    "queryMapperType": "SimpleQueryMapper",
+                    "statsType": "mappingStats",
+                    "libVersion": "php-client 1.0"
+                }
+            ]',
+            $originalSearchString,
+            $optimizedSearchString,
+            $redirect,
+            $duration * 1000 * 1000 * 1000,
+            $SearchHubConstants::ACCOUNT_NAME,
+            $SearchHubConstants::CHANNEL_NAME
+        );
+
+        $promise = $this->getHttpClient((float) 0.01)->requestAsync(
+            'post',
+            $SearchHubConstants::MAPPINGSTATS_ENDPOINT,
+            [
+                'headers' => [
+                    'apikey' => $SearchHubConstants::API_KEY,
+                    'X-Consumer-Username' => $SearchHubConstants::ACCOUNT_NAME,
+                    'Content-type' => 'application/json',
+                ],
+                'body' => $event,
+            ]
+        );
+        try {
+            $promise->wait();
+        } catch (\Exception $ex) {
+             /*
+              * will throw a timeout exception which we ignore, as we don't want to wait for any result
+              */
+        }
     }
 }
