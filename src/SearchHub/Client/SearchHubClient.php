@@ -1,0 +1,133 @@
+<?php
+
+namespace SearchHub\Client;
+
+use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Psr7\Response;
+use SearchHub\Client\SearchHubConstants;
+
+/**
+ * Class SearchHubClient
+ * @package SearchHub\Client
+ */
+class SearchHubClient implements SearchHubClientInterface
+{
+    /**
+     * @var ClientInterface
+     */
+    protected $httpClient;
+
+    public function __construct()
+    {
+
+    }
+
+    protected function optimize(SearchHubRequest $searchHubRequest)
+    {
+        $mappings = $this->loadMappings(SearchHubConstants::MAPPING_QUERIES_ENDPOINT );
+        if (isset($mappings[$searchHubRequest->getUserQuery()]) ) {
+            $mapping = $mappings[$searchHubRequest->getUserQuery()];
+            if (isset($mapping["redirect"])) {
+                if (strpos($mapping["redirect"], 'http') === 0) {
+                    //TODO: log
+                    header('Location: ' . $mapping["redirect"]);
+                }
+                else {
+                    //TODO: log
+                    header('Location: ' . SearchHubConstants::REDIRECTS_BASE_URL . $mapping["redirect"]);
+                }
+                exit;
+            }
+            else {
+                //TODO: log
+                //TODO: optional: implement async back-channel for searchhub statistics
+                $searchHubRequest->setSearchQuery($mapping["masterQuery"]);
+            }
+            return $searchHubRequest;
+        }
+        return $searchHubRequest;
+
+    }
+
+    /**
+     * Get Http Client
+     *
+     * @throws Exception
+     *
+     * @return ClientInterface
+     */
+    protected function getHttpClient(): ClientInterface
+    {
+        if ($this->httpClient === null) {
+            $this->httpClient = new Client([
+                'timeout' => (float) SearchHubConstants::REQUEST_TIMEOUT,
+            ]);
+        }
+        return $this->httpClient;
+    }
+
+    /**
+     * @return array
+     * @throws Exception
+     */
+    protected function loadMappings(string $uri): array
+    {
+        $cache = SearchHubConstants::MAPPING_CACHE;
+        $key = $cache->generateKey("SearchHubClient", $uri);
+
+        $mappings = $this->loadMappingsFromCache($key);
+        if ($mappings === null ) {
+            try {
+                $mappingsResponse = $this->getHttpClient()->get($uri, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
+                assert($mappingsResponse instanceof Response);
+                $indexedMappings = $this->indexMappings(json_decode($mappingsResponse->getBody()->getContents(), true));
+                $cache->write($key, json_encode($indexedMappings));
+                return $indexedMappings;
+            } catch (Exception $e) {
+                //TODO: log
+                return array();
+            }
+        }
+        return json_decode($mappings, true);
+    }
+
+    protected function loadMappingsFromCache(string $cacheFile)
+    {
+        if (file_exists($cacheFile) ) {
+            if (time() - filemtime($cacheFile) < SearchHubConstants::MAPPING_CACHE_TTL) {
+                return file_get_contents($cacheFile);
+            } else {
+                $lastModifiedResponse = $this->getHttpClient()->get(SearchHubConstants::MAPPING_LASTMODIFIED_ENDPOINT, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
+                assert($lastModifiedResponse instanceof Response);
+                if (filemtime($cacheFile) > ((int)($lastModifiedResponse->getBody()->getContents()) / 1000 + SearchHubConstants::MAPPING_CACHE_TTL)) {
+                    touch($cacheFile);
+                    return file_get_contents($cacheFile);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param $mappingsRaw
+     * @return array
+     */
+    protected function indexMappings($mappingsRaw): array
+    {
+        $indexedMappings = array();
+        if (isset($mappingsRaw["clusters"]) && is_array($mappingsRaw["clusters"])) { //v2
+            foreach ($mappingsRaw["clusters"] as $mapping) {
+                foreach ($mapping["queries"] as $variant) {
+                    $indexedMappings[$variant] = array();
+                    $indexedMappings[$variant]["masterQuery"] = $mapping["masterQuery"];
+                    if ($mapping["redirect"] !== null) {
+                        $indexedMappings[$variant]["redirect"] = $mapping["redirect"];
+                    }
+                }
+            }
+        }
+        return $indexedMappings;
+    }
+}
