@@ -111,4 +111,9 @@ class SearchHubRequest
         return $this->exceptionMessage;
     }
 
+    public function __toString()
+    {
+        return "userQuery: " . $this->userQuery . " , searchQuery: " . $this->searchQuery. "\n";
+    }
+
 }

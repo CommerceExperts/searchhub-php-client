@@ -24,10 +24,10 @@ class SearchHubClient implements SearchHubClientInterface
 
     }
 
-    protected function optimize(SearchHubRequest $searchHubRequest)
+    public function optimize(SearchHubRequest $searchHubRequest): SearchHubRequest
     {
         $startTimestamp = microtime(true);
-        $mappings = $this->loadMappings(SearchHubConstants::MAPPING_QUERIES_ENDPOINT );
+        $mappings = $this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint(SearchHubConstants::ACCOUNT_NAME, SearchHubConstants::CHANNEL_NAME));
         if (isset($mappings[$searchHubRequest->getUserQuery()]) ) {
             $mapping = $mappings[$searchHubRequest->getUserQuery()];
             if (isset($mapping["redirect"])) {
@@ -39,23 +39,23 @@ class SearchHubClient implements SearchHubClientInterface
                     //TODO: log
                     header('Location: ' . SearchHubConstants::REDIRECTS_BASE_URL . $mapping["redirect"]);
                 }
-                $this->report(
-                    $searchHubRequest->getUserQuery(),
-                    $mapping["masterQuery"],
-                    microtime(true) - $startTimestamp,
-                    true
-                );
+//                $this->report(
+//                    $searchHubRequest->getUserQuery(),
+//                    $mapping["masterQuery"],
+//                    microtime(true) - $startTimestamp,
+//                    true
+//                );
                 exit;
             }
             else {
                 //TODO: log
                 $searchHubRequest->setSearchQuery($mapping["masterQuery"]);
-                $this->report(
-                    $searchHubRequest->getUserQuery(),
-                    $mapping["masterQuery"],
-                    microtime(true) - $startTimestamp,
-                    false
-                );
+//                $this->report(
+//                    $searchHubRequest->getUserQuery(),
+//                    $mapping["masterQuery"],
+//                    microtime(true) - $startTimestamp,
+//                    false
+//                );
             }
             return $searchHubRequest;
         }
@@ -86,7 +86,7 @@ class SearchHubClient implements SearchHubClientInterface
      */
     protected function loadMappings(string $uri): array
     {
-        $cache = SearchHubConstants::MAPPING_CACHE;
+        $cache = SearchHubConstants::getMappingCache(SearchHubConstants::ACCOUNT_NAME, SearchHubConstants::CHANNEL_NAME);
         $key = $cache->generateKey("SearchHubClient", $uri);
 
         $mappings = $this->loadMappingsFromCache($key);
@@ -111,7 +111,7 @@ class SearchHubClient implements SearchHubClientInterface
             if (time() - filemtime($cacheFile) < SearchHubConstants::MAPPING_CACHE_TTL) {
                 return file_get_contents($cacheFile);
             } else {
-                $lastModifiedResponse = $this->getHttpClient()->get(SearchHubConstants::MAPPING_LASTMODIFIED_ENDPOINT, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
+                $lastModifiedResponse = $this->getHttpClient()->get(SearchHubConstants::getMappingLastModifiedEndpoint(SearchHubConstants::ACCOUNT_NAME, SearchHubConstants::CHANNEL_NAME), ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
                 assert($lastModifiedResponse instanceof Response);
                 if (filemtime($cacheFile) > ((int)($lastModifiedResponse->getBody()->getContents()) / 1000 + SearchHubConstants::MAPPING_CACHE_TTL)) {
                     touch($cacheFile);

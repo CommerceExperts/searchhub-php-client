@@ -1,0 +1,11 @@
+{
+  "autoload": {
+    "psr-4": {
+      "SearchHub\\Client\\": "src/SearchHub/Client"
+    }
+  },
+  "require": {
+    "twig/twig": "^3.0",
+    "guzzlehttp/guzzle": "^7.8"
+  }
+}
