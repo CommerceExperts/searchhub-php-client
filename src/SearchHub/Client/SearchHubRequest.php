@@ -113,7 +113,12 @@ class SearchHubRequest
 
     public function __toString()
     {
-        return "userQuery: " . $this->userQuery . " , searchQuery: " . $this->searchQuery. "\n";
+        return "userQuery: " . $this->userQuery . " | searchQuery: " . $this->searchQuery . "\n";
+    }
+
+    public function isMapped(): bool
+    {
+        return (boolval($this->searchQuery));
     }
 
 }

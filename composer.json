@@ -1,11 +1,15 @@
 {
   "autoload": {
     "psr-4": {
-      "SearchHub\\Client\\": "src/SearchHub/Client"
+      "SearchHub\\Client\\": "src/SearchHub/Client",
+      "App\\": "Tests/"
     }
   },
   "require": {
     "twig/twig": "^3.0",
     "guzzlehttp/guzzle": "^7.8"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^11.1"
   }
 }
