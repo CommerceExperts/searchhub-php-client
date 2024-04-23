@@ -2,11 +2,39 @@
 
 use PHPUnit\Framework\TestCase;
 
+require_once 'vendor/autoload.php';
+
+use SearchHub\Client\SearchHubClient;
+use SearchHub\Client\SearchHubRequest;
+
 class SearchHubRequestTest extends TestCase {
-    public function testRequest()
+    public function testRequest1()
     {
-        $searchHubRequestApp = new test;
-        $result = $searchHubRequestApp->fgets("vinylclick");
-        $this->assertEquals("click-vinyl", $result);
+        $searchHubRequest = new SearchHubRequest("vinylclick");
+
+        $client = new SearchHubClient("api.key", "account_name", "channel_name");
+        $result = $client->optimize($searchHubRequest);
+        $this->assertEquals("click-vinyl", $result->getSearchQuery());
+
+    }
+
+    public function testRequest2()
+    {
+        $searchHubRequest = new SearchHubRequest("arbeits platte");
+
+        $client = new SearchHubClient("api.key", "account_name", "channel_name");
+        $result = $client->optimize($searchHubRequest);
+        $this->assertEquals("árbeitsplatten", $result->getSearchQuery());
+
+    }
+
+    public function testRequest3()
+    {
+
+        $searchHubRequest = new SearchHubRequest("sägenketten");
+
+        $client = new SearchHubClient("api.key", "account_name", "channel_name");
+        $result = $client->optimize($searchHubRequest);
+        $this->assertEquals("kette säge", $result->getSearchQuery());
     }
 }
