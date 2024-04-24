@@ -1,5 +1,6 @@
 {
   "apiKey": "xxxxngipou1xxxxxx",
   "accountName": "xexx",
-  "channelName": "xoxxxxx"
+  "channelName": "xoxxxxx",
+  "stage": "prod"
 }

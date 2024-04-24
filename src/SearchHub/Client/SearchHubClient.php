@@ -34,6 +34,11 @@ class SearchHubClient implements SearchHubClientInterface
      */
     protected $channelName;
 
+    /**
+     * @var string
+     */
+    protected $stage;
+
 
     /**
      * @param string|null $arg1
@@ -82,9 +87,21 @@ class SearchHubClient implements SearchHubClientInterface
         return $this->channelName;
     }
 
-    public function __construct(string $arg1, string $accountName=null, string $channelName=null)
+    public function setStage ($stage=null): ?SearchHubClient {
+        $this->stage = ($stage === "qa") ? "qa" : "prod";
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getStage(): ?string {
+        return $this->stage;
+    }
+
+    public function __construct(string $arg1, string $accountName=null, string $channelName=null, string $stage=null)
     {// Overloading of constructor
-        if ($arg1 and !($accountName or $channelName)){
+        if ($arg1 and !($accountName or $channelName or $stage)){
             $jsonPath = $arg1;
 
             $jsonString = file_get_contents($jsonPath);
@@ -99,6 +116,9 @@ class SearchHubClient implements SearchHubClientInterface
             if (isset($data['channelName'])) {
                 $this->setChannelName($data['channelName']);
             }
+            if (isset($data['stage'])) {
+                $this->setStage($data['stage']);
+            }
         }
         else {
             // 2+ argument - parameters of client
@@ -106,12 +126,13 @@ class SearchHubClient implements SearchHubClientInterface
             $this->setClientApiKey($clientApiKey);
             $this->setAccountName($accountName);
             $this->setChannelName($channelName);
+            $this->setStage($stage);
         }
     }
 
     public function __toString()
     {
-        return "clientApiKey: " . $this->getClientApiKey() . " | accountName: " . $this->getAccountName() . " | channelName: ". $this->channelName . "\n";
+        return "clientApiKey: " . $this->getClientApiKey() . " | accountName: " . $this->getAccountName() . " | channelName: ". $this->channelName ." | stage: $this->stage\n";
     }
 
     public function optimize(SearchHubRequest $searchHubRequest): SearchHubRequest
@@ -129,23 +150,23 @@ class SearchHubClient implements SearchHubClientInterface
                     //TODO: log
                     header('Location: ' . SearchHubConstants::REDIRECTS_BASE_URL . $mapping["redirect"]);
                 }
-//                $this->report(
-//                    $searchHubRequest->getUserQuery(),
-//                    $mapping["masterQuery"],
-//                    microtime(true) - $startTimestamp,
-//                    true
-//                );
+                $this->report(
+                    $searchHubRequest->getUserQuery(),
+                    $mapping["masterQuery"],
+                    microtime(true) - $startTimestamp,
+                    true
+                );
                 exit;
             }
             else {
                 //TODO: log
                 $searchHubRequest->setSearchQuery($mapping["masterQuery"]);
-//                $this->report(
-//                    $searchHubRequest->getUserQuery(),
-//                    $mapping["masterQuery"],
-//                    microtime(true) - $startTimestamp,
-//                    false
-//                );
+                $this->report(
+                    $searchHubRequest->getUserQuery(),
+                    $mapping["masterQuery"],
+                    microtime(true) - $startTimestamp,
+                    false
+                );
             }
             return $searchHubRequest;
         }
@@ -268,28 +289,23 @@ class SearchHubClient implements SearchHubClientInterface
             $optimizedSearchString,
             $redirect,
             $duration * 1000 * 1000 * 1000,
-            $SearchHubConstants::ACCOUNT_NAME,
-            $SearchHubConstants::CHANNEL_NAME
+            $this->accountName,
+            $this->channelName
         );
 
-        $promise = $this->getHttpClient((float) 0.01)->requestAsync(
+        echo $event;
+
+        $this->getHttpClient()->requestAsync(
             'post',
-            $SearchHubConstants::MAPPINGSTATS_ENDPOINT,
+            SearchHubConstants::MAPPINGSTATS_ENDPOINT,
             [
                 'headers' => [
-                    'apikey' => $SearchHubConstants::API_KEY,
-                    'X-Consumer-Username' => $SearchHubConstants::ACCOUNT_NAME,
-                    'Content-type' => 'application/json',
+                    'apikey' => $this->clientApiKey,
+                    'Content-Type' => 'application/json',
                 ],
                 'body' => $event,
             ]
         );
-        try {
-            $promise->wait();
-        } catch (\Exception $ex) {
-             /*
-              * will throw a timeout exception which we ignore, as we don't want to wait for any result
-              */
-        }
+
     }
 }
