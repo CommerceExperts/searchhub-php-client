@@ -39,6 +39,11 @@ class SearchHubClient implements SearchHubClientInterface
      */
     protected $stage;
 
+    /**
+     * @var MappingCacheInterface
+     */
+    protected $mappingCache;
+
     public function setClientApiKey($apiKey): ?SearchHubClient
     {
         $this->apiKey = $apiKey;
@@ -119,6 +124,11 @@ class SearchHubClient implements SearchHubClientInterface
             if (isset($data['stage'])) {
                 $this->setStage($data['stage']);
             }
+            // TODO: $this->mappingCache = new MappingCache(...)
+             if ($this->mappingCache->isEmpty()) {
+                $mappings = $this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
+                $this->mappingCache->loadCache($mappings);
+             }
         }
         else {
             // 2+ argument - parameters of client
@@ -139,9 +149,9 @@ class SearchHubClient implements SearchHubClientInterface
     public function optimize(SearchHubRequest $searchHubRequest): SearchHubRequest
     {
         $startTimestamp = microtime(true);
-        $mappings = $this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
-        if (isset($mappings[$searchHubRequest->getUserQuery()]) ) {
-            $mapping = $mappings[$searchHubRequest->getUserQuery()];
+
+        $mapping = $this->mappingCache->get($searchHubRequest->getUserQuery());
+        if ( $mapping != null ) {
             if (isset($mapping["redirect"])) {
                 if (strpos($mapping["redirect"], 'http') === 0) {
                     //TODO: log
