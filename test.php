@@ -3,6 +3,7 @@
 require_once 'vendor/autoload.php';
 
 use SearchHub\Client\SearchHubClient;
+use SearchHub\Client\SearchHubConstants;
 use SearchHub\Client\SearchHubRequest;
 
 $Client1 = new SearchHubClient("Clients\Client1.json");
@@ -19,7 +20,7 @@ $userQuery = trim($input, "\ \n\r\t\v\0"); //Entwerfen "\n", die am ende steht
 
 $searchHubRequest = new SearchHubRequest($userQuery);
 
-$client = new SearchHubClient(",",",",",");
+$client = new SearchHubClient(SearchHubConstants::API_KEY, SearchHubConstants::ACCOUNT_NAME,SearchHubConstants::CHANNEL_NAME, "qa");
 $result = $client->optimize($searchHubRequest);
 
 //if ($result->isMapped()) {

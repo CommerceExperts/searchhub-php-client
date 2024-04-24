@@ -256,13 +256,14 @@ class SearchHubClient implements SearchHubClientInterface
 
 
     /**
-    * @param string $originalSearchString
-    * @param string $optimizedSearchString
-    * @param float $duration
-    * @param bool $redirect
-    *
-    * @return void
-    */
+     * @param string $originalSearchString
+     * @param string $optimizedSearchString
+     * @param float $duration
+     * @param bool $redirect
+     *
+     * @return void
+     * @throws Exception
+     */
     protected function report(
             string $originalSearchString,
             string $optimizedSearchString,
@@ -297,7 +298,7 @@ class SearchHubClient implements SearchHubClientInterface
 
         $this->getHttpClient()->requestAsync(
             'post',
-            SearchHubConstants::MAPPINGSTATS_ENDPOINT,
+            SearchHubConstants::getMappingDataStatsEndpoint($this->stage),
             [
                 'headers' => [
                     'apikey' => $this->clientApiKey,
