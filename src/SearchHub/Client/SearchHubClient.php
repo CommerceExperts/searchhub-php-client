@@ -6,7 +6,7 @@ use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
-use SearchHub\Client\SearchHubConstants;
+
 
 /**
  * Class SearchHubClient
@@ -38,14 +38,6 @@ class SearchHubClient implements SearchHubClientInterface
      * @var string
      */
     protected $stage;
-
-
-    /**
-     * @param string|null $arg1
-     * @param string|null $accountName
-     * @param string|null $channelName
-     * @return $this
-     */
 
     public function setClientApiKey($apiKey): ?SearchHubClient
     {
@@ -99,6 +91,14 @@ class SearchHubClient implements SearchHubClientInterface
         return $this->stage;
     }
 
+    /**
+     * @param string $arg1
+     * @param string|null $accountName
+     * @param string|null $channelName
+     * @param string|null $stage
+     * @return $this
+     */
+
     public function __construct(string $arg1, string $accountName=null, string $channelName=null, string $stage=null)
     {// Overloading of constructor
         if ($arg1 and !($accountName or $channelName or $stage)){
@@ -138,7 +138,7 @@ class SearchHubClient implements SearchHubClientInterface
     public function optimize(SearchHubRequest $searchHubRequest): SearchHubRequest
     {
         $startTimestamp = microtime(true);
-        $mappings = $this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint(SearchHubConstants::ACCOUNT_NAME, SearchHubConstants::CHANNEL_NAME));
+        $mappings = $this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName));
         if (isset($mappings[$searchHubRequest->getUserQuery()]) ) {
             $mapping = $mappings[$searchHubRequest->getUserQuery()];
             if (isset($mapping["redirect"])) {
@@ -197,7 +197,7 @@ class SearchHubClient implements SearchHubClientInterface
      */
     protected function loadMappings(string $uri): array
     {
-        $cache = SearchHubConstants::getMappingCache(SearchHubConstants::ACCOUNT_NAME, SearchHubConstants::CHANNEL_NAME);
+        $cache = SearchHubConstants::getMappingCache($this->accountName, $this->channelName);
         $key = $cache->generateKey("SearchHubClient", $uri);
 
         $mappings = $this->loadMappingsFromCache($key);
@@ -222,7 +222,7 @@ class SearchHubClient implements SearchHubClientInterface
             if (time() - filemtime($cacheFile) < SearchHubConstants::MAPPING_CACHE_TTL) {
                 return file_get_contents($cacheFile);
             } else {
-                $lastModifiedResponse = $this->getHttpClient()->get(SearchHubConstants::getMappingLastModifiedEndpoint(SearchHubConstants::ACCOUNT_NAME, SearchHubConstants::CHANNEL_NAME), ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
+                $lastModifiedResponse = $this->getHttpClient()->get(SearchHubConstants::getMappingLastModifiedEndpoint($this->accountName, $this->channelName), ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
                 assert($lastModifiedResponse instanceof Response);
                 if (filemtime($cacheFile) > ((int)($lastModifiedResponse->getBody()->getContents()) / 1000 + SearchHubConstants::MAPPING_CACHE_TTL)) {
                     touch($cacheFile);

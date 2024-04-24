@@ -23,10 +23,8 @@ $searchHubRequest = new SearchHubRequest($userQuery);
 $client = new SearchHubClient(SearchHubConstants::API_KEY, SearchHubConstants::ACCOUNT_NAME,SearchHubConstants::CHANNEL_NAME, "qa");
 $result = $client->optimize($searchHubRequest);
 
-//if ($result->isMapped()) {
-//    echo "Mapped from: " . $result->getUserQuery() . " to : " . $result->getSearchQuery(). "\n" ;
-//} else {
-//    echo "No mapping found!\n";
-//}
+if (!$result->isMapped()) {
+    echo "No mapping found!\n";
+}
 
 ?>
