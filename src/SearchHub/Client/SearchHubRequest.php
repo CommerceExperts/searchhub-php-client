@@ -28,7 +28,7 @@ class SearchHubRequest
 
     public function __construct(string $userQuery)
     {
-        $this->userQuery = strtolower($userQuery);
+        $this->userQuery = mb_strtolower($userQuery);
     }
 
     /**
@@ -38,7 +38,7 @@ class SearchHubRequest
      */
     public function setUserQuery($userQuery)
     {
-        $this->userQuery = strtolower($userQuery);
+        $this->userQuery = mb_strtolower($userQuery);
 
         return $this;
     }

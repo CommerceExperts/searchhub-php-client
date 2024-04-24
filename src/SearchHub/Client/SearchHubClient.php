@@ -138,7 +138,7 @@ class SearchHubClient implements SearchHubClientInterface
     public function optimize(SearchHubRequest $searchHubRequest): SearchHubRequest
     {
         $startTimestamp = microtime(true);
-        $mappings = $this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName));
+        $mappings = $this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
         if (isset($mappings[$searchHubRequest->getUserQuery()]) ) {
             $mapping = $mappings[$searchHubRequest->getUserQuery()];
             if (isset($mapping["redirect"])) {
@@ -222,7 +222,7 @@ class SearchHubClient implements SearchHubClientInterface
             if (time() - filemtime($cacheFile) < SearchHubConstants::MAPPING_CACHE_TTL) {
                 return file_get_contents($cacheFile);
             } else {
-                $lastModifiedResponse = $this->getHttpClient()->get(SearchHubConstants::getMappingLastModifiedEndpoint($this->accountName, $this->channelName), ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
+                $lastModifiedResponse = $this->getHttpClient()->get(SearchHubConstants::getMappingLastModifiedEndpoint($this->accountName, $this->channelName, $this->stage), ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
                 assert($lastModifiedResponse instanceof Response);
                 if (filemtime($cacheFile) > ((int)($lastModifiedResponse->getBody()->getContents()) / 1000 + SearchHubConstants::MAPPING_CACHE_TTL)) {
                     touch($cacheFile);
