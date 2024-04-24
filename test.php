@@ -7,8 +7,8 @@ use SearchHub\Client\SearchHubRequest;
 
 
 
-$Client1 = new SearchHubClient("Client1.txt");
-$Client2 = new SearchHubClient("Client2.txt");
+$Client1 = new SearchHubClient("Clients\Client1.json");
+$Client2 = new SearchHubClient("Clients\Client2.json");
 $Client3 = new SearchHubClient("api242323231", "Name3334", "Channel9923");
 $Client4 = new SearchHubClient("api25775231", "Name765", "Channel45ß");
 

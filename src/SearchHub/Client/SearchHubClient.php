@@ -85,22 +85,20 @@ class SearchHubClient implements SearchHubClientInterface
     public function __construct(string $arg1, string $accountName=null, string $channelName=null)
     {// Overloading of constructor
         if ($arg1 and !($accountName or $channelName)){
-            $filename = $arg1;
-            //$file = fopen("../../../Clients\\" . $filename, "r") or die("Unable to open file!");
-            $file = fopen("C:\Users\Vitalii\Documents\GitHub\searchhub-php-client\Clients\\" . $filename, "r") or die("Unable to open file!");
-            $data = fgets($file);
-            fclose($file);
+            $jsonPath = $arg1;
 
-            $parts = explode(",", $data);
+            $jsonString = file_get_contents($jsonPath);
 
-// Видаляємо пробіли з кожної частини
-            $clientApiKey = trim($parts[0]);
-            $accountName = trim($parts[1]);
-            $channelName = trim($parts[2]);
-
-            $this->setClientApiKey($clientApiKey);
-            $this->setAccountName($accountName);
-            $this->setChannelName($channelName);
+            $data = json_decode($jsonString, true);
+            if (isset($data['apiKey'])) {
+                $this->setClientApiKey($data['apiKey']);
+            }
+            if (isset($data['accountName'])) {
+                $this->setAccountName($data['accountName']);
+            }
+            if (isset($data['channelName'])) {
+                $this->setChannelName($data['channelName']);
+            }
         }
         else {
             // 2+ argument - parameters of client
