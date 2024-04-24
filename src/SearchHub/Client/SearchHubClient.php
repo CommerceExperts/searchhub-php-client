@@ -128,6 +128,7 @@ class SearchHubClient implements SearchHubClientInterface
             $this->setChannelName($channelName);
             $this->setStage($stage);
         }
+        return $this;
     }
 
     public function __toString()
