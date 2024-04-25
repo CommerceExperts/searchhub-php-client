@@ -27,40 +27,17 @@ class MappingCache implements MappingCacheInterface
      * @return SearchHubRequest
      */
     public function get(string $query): string{
-        return "Wir arbeiten davon";
+        return "Arbeit";
     }
 
-    /**
-     * Optimize Query by sending it to searchhub checking whether there is a better performing
-     * variant of the same search
-     *
-     * @param void
-     *
-     * @return void
-     */
     public function deleteCache(): void{
         $this->cache = null;
     }
 
-    /**
-     * Rewrite cache
-     *
-     * @param void//TODO
-     *
-     * @return void
-     */
     public function loadCache(array $loadedCache): void{
         $this->cache = $loadedCache;
     }
 
-    /**
-     * Optimize Query by sending it to searchhub checking whether there is a better performing
-     * variant of the same search
-     *
-     * @param void
-     *
-     * @return bool
-     */
     public function isEmpty(): bool
     {
         return boolval($this->cache);

@@ -125,10 +125,10 @@ class SearchHubClient implements SearchHubClientInterface
                 $this->setStage($data['stage']);
             }
             // TODO: $this->mappingCache = new MappingCache(...)
-             if ($this->mappingCache->isEmpty()) {
-                $mappings = $this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
-                $this->mappingCache->loadCache($mappings);
-             }
+//             if ($this->mappingCache->isEmpty()) {
+//                $mappings = $this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
+//                $this->mappingCache->loadCache($mappings);
+//             }
         }
         else {
             // 2+ argument - parameters of client
@@ -146,12 +146,18 @@ class SearchHubClient implements SearchHubClientInterface
         return "clientApiKey: " . $this->getClientApiKey() . " | accountName: " . $this->getAccountName() . " | channelName: ". $this->channelName ." | stage: $this->stage\n";
     }
 
+    /**
+     * @throws Exception
+     */
     public function optimize(SearchHubRequest $searchHubRequest): SearchHubRequest
     {
         $startTimestamp = microtime(true);
+        //$mapping = $this->mappingCache->get($searchHubRequest->getUserQuery());
+        $mappings = $this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
+        if (isset($mappings[$searchHubRequest->getUserQuery()]) ) {
+            $mapping = $mappings[$searchHubRequest->getUserQuery()];
 
-        $mapping = $this->mappingCache->get($searchHubRequest->getUserQuery());
-        if ( $mapping != null ) {
+        //if ($mapping != null ) {
             if (isset($mapping["redirect"])) {
                 if (strpos($mapping["redirect"], 'http') === 0) {
                     //TODO: log
