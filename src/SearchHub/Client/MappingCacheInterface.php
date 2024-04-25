@@ -5,7 +5,7 @@ namespace SearchHub\Client;
 interface MappingCacheInterface
 {
 
-    public function get(string $query): array;
+    public function get(string $query): string;
 
     /**
      * Optimize Query by sending it to searchhub checking whether there is a better performing

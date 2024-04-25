@@ -9,7 +9,6 @@ class MappingCache implements MappingCacheInterface
     /**
      * Get cache and save it
      *
-     * @param $cache //TODO Datatyp
      *
      */
     public function __construct(string $accountName, string $channelName){
@@ -24,10 +23,16 @@ class MappingCache implements MappingCacheInterface
      *
      * @param string $query
      *
-     * @return SearchHubRequest
+     *
      */
-    public function get(string $query): string{
-        return "Arbeit";
+    public function get(string $query): string
+    {
+        $mappings = $this->cache;   //$this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
+        if (isset($mappings[$query])) {
+            $mapping = $mappings[$query];
+            return $mapping["masterQuery"];
+        }
+        return "";
     }
 
     public function deleteCache(): void{
@@ -36,6 +41,11 @@ class MappingCache implements MappingCacheInterface
 
     public function loadCache(array $loadedCache): void{
         $this->cache = $loadedCache;
+    }
+
+    public function getCache(): \Twig\Cache\FilesystemCache
+    {
+        return $this->cache;
     }
 
     public function isEmpty(): bool

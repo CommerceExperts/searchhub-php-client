@@ -28,5 +28,4 @@ $result = $client->optimize($searchHubRequest);
 if (!$result->isMapped()) {
     echo "No mapping found!\n";
 }
-
 ?>

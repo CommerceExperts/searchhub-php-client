@@ -58,7 +58,8 @@ class SearchHubClient implements SearchHubClientInterface
         return $this->clientApiKey;
     }
 
-    public function setAccountName($accountName): ?SearchHubClient {
+    public function setAccountName($accountName): ?SearchHubClient
+    {
         $this->accountName = $accountName;
         return $this;
     }
@@ -67,12 +68,14 @@ class SearchHubClient implements SearchHubClientInterface
     /**
      * @return string|null
      */
-    public function getAccountName(): ?string {
+    public function getAccountName(): ?string
+    {
         return $this->accountName;
     }
 
 
-    public function setChannelName($channelName): ?SearchHubClient {
+    public function setChannelName($channelName): ?SearchHubClient
+    {
         $this->channelName = $channelName;
         return $this;
     }
@@ -80,11 +83,13 @@ class SearchHubClient implements SearchHubClientInterface
     /**
      * @return string|null
      */
-    public function getChannelName(): ?string {
+    public function getChannelName(): ?string
+    {
         return $this->channelName;
     }
 
-    public function setStage ($stage=null): ?SearchHubClient {
+    public function setStage($stage = null): ?SearchHubClient
+    {
         $this->stage = ($stage === "qa") ? "qa" : "prod";
         return $this;
     }
@@ -92,7 +97,8 @@ class SearchHubClient implements SearchHubClientInterface
     /**
      * @return string|null
      */
-    public function getStage(): ?string {
+    public function getStage(): ?string
+    {
         return $this->stage;
     }
 
@@ -102,11 +108,12 @@ class SearchHubClient implements SearchHubClientInterface
      * @param string|null $channelName
      * @param string|null $stage
      * @return $this
+     * @throws Exception
      */
 
-    public function __construct(string $arg1, string $accountName=null, string $channelName=null, string $stage=null)
+    public function __construct(string $arg1, string $accountName = null, string $channelName = null, string $stage = null)
     {// Overloading of constructor
-        if ($arg1 and !($accountName or $channelName or $stage)){
+        if ($arg1 and !($accountName or $channelName or $stage)) {
             $jsonPath = $arg1;
 
             $jsonString = file_get_contents($jsonPath);
@@ -124,13 +131,7 @@ class SearchHubClient implements SearchHubClientInterface
             if (isset($data['stage'])) {
                 $this->setStage($data['stage']);
             }
-            // TODO: $this->mappingCache = new MappingCache(...)
-//             if ($this->mappingCache->isEmpty()) {
-//                $mappings = $this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
-//                $this->mappingCache->loadCache($mappings);
-//             }
-        }
-        else {
+        } else {
             // 2+ argument - parameters of client
             $clientApiKey = $arg1;
             $this->setClientApiKey($clientApiKey);
@@ -138,12 +139,17 @@ class SearchHubClient implements SearchHubClientInterface
             $this->setChannelName($channelName);
             $this->setStage($stage);
         }
-        return $this;
+
+        $this->mappingCache = new MappingCache($this->accountName, $this->channelName);
+        if ($this->mappingCache->isEmpty()) {
+            $mappings = $this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
+            $this->mappingCache->loadCache($mappings);
+        }
     }
 
     public function __toString()
     {
-        return "clientApiKey: " . $this->getClientApiKey() . " | accountName: " . $this->getAccountName() . " | channelName: ". $this->channelName ." | stage: $this->stage\n";
+        return "clientApiKey: " . $this->getClientApiKey() . " | accountName: " . $this->getAccountName() . " | channelName: " . $this->channelName . " | stage: $this->stage\n";
     }
 
     /**
@@ -153,42 +159,40 @@ class SearchHubClient implements SearchHubClientInterface
     {
         $startTimestamp = microtime(true);
         //$mapping = $this->mappingCache->get($searchHubRequest->getUserQuery());
-        $mappings = $this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
-        if (isset($mappings[$searchHubRequest->getUserQuery()]) ) {
-            $mapping = $mappings[$searchHubRequest->getUserQuery()];
 
-        //if ($mapping != null ) {
-            if (isset($mapping["redirect"])) {
-                if (strpos($mapping["redirect"], 'http') === 0) {
-                    //TODO: log
-                    header('Location: ' . $mapping["redirect"]);
-                }
-                else {
-                    //TODO: log
-                    header('Location: ' . SearchHubConstants::REDIRECTS_BASE_URL . $mapping["redirect"]);
-                }
-                $this->report(
-                    $searchHubRequest->getUserQuery(),
-                    $mapping["masterQuery"],
-                    microtime(true) - $startTimestamp,
-                    true
-                );
-                exit;
-            }
-            else {
+//        $mappings = $this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
+//        if (isset($mappings[$searchHubRequest->getUserQuery()]) ) {
+//            $mapping = $mappings[$searchHubRequest->getUserQuery()];
+//
+//        //if ($mapping != null ) {
+        $userQuery = $searchHubRequest->getUserQuery();
+        $mapping = $this->mappingCache->get($userQuery);
+        if (isset($mapping["redirect"])) {
+            if (strpos($mapping["redirect"], 'http') === 0) {
                 //TODO: log
-                $searchHubRequest->setSearchQuery($mapping["masterQuery"]);
-                $this->report(
-                    $searchHubRequest->getUserQuery(),
-                    $mapping["masterQuery"],
-                    microtime(true) - $startTimestamp,
-                    false
-                );
+                header('Location: ' . $mapping["redirect"]);
+            } else {
+                //TODO: log
+                header('Location: ' . SearchHubConstants::REDIRECTS_BASE_URL . $mapping["redirect"]);
             }
-            return $searchHubRequest;
+            $this->report(
+                $searchHubRequest->getUserQuery(),
+                $mapping,
+                microtime(true) - $startTimestamp,
+                true
+            );
+            exit;
+        } else {
+            //TODO: log
+            $searchHubRequest->setSearchQuery($mapping);
+            $this->report(
+                $searchHubRequest->getUserQuery(),
+                $mapping,
+                microtime(true) - $startTimestamp,
+                false
+            );
         }
         return $searchHubRequest;
-
     }
 
     /**
