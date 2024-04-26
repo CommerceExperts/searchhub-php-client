@@ -141,6 +141,7 @@ class SearchHubClient implements SearchHubClientInterface
         }
 
         $this->mappingCache = new MappingCache($this->accountName, $this->channelName);
+        //$this->mappingCache->deleteCache(); //TODO DELETE IN FUTURE
         if ($this->mappingCache->isEmpty()) {
             $mappings = $this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
             $this->mappingCache->loadCache($mappings);
@@ -314,11 +315,10 @@ class SearchHubClient implements SearchHubClientInterface
             $this->accountName,
             $this->channelName
         );
-
-        echo $event;
-
-        $this->getHttpClient()->requestAsync(
-            'post',
+        if ($optimizedSearchString){
+            echo $event;
+            $this->getHttpClient()->requestAsync(
+                'post',
             SearchHubConstants::getMappingDataStatsEndpoint($this->stage),
             [
                 'headers' => [
@@ -327,7 +327,7 @@ class SearchHubClient implements SearchHubClientInterface
                 ],
                 'body' => $event,
             ]
-        );
-
+            );
+        }
     }
 }

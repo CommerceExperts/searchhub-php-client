@@ -16,7 +16,9 @@ class MappingCache implements MappingCacheInterface
     public function __construct(string $accountName, string $channelName){
         $this->accountName = $accountName;
         $this->channelName = $channelName;
+        $this->cache = null;
         $this->cache = SearchHubConstants::getMappingCache($accountName, $channelName);
+
         // TODO: load mappings from file
     }
 
@@ -31,7 +33,7 @@ class MappingCache implements MappingCacheInterface
      */
     public function get(string $query): string
     {
-        $mappings = $this->cache;   //$this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
+        $this->cache->generateKey($query);   //$this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
         if (isset($mappings[$query])) {
             $mapping = $mappings[$query];
             return $mapping["masterQuery"];
@@ -53,7 +55,11 @@ class MappingCache implements MappingCacheInterface
     }
 
     public function loadCache(array $loadedCache): void{
-        $this->cache = $loadedCache;
+        //$this->cache = $loadedCache;
+        foreach ($loadedCache as $key => $value) {
+            $this->cache->write($key, $value);
+        }
+
     }
 
     public function getCache(): \Twig\Cache\FilesystemCache
@@ -63,7 +69,8 @@ class MappingCache implements MappingCacheInterface
 
     public function isEmpty(): bool
     {
-        $filePath = "/tmp/cache/data/cache/searchhub/{$this->accountName}/{$this->channelName}";
-        return count(glob($filePath . '/*')) === 0;
+        //$filePath = "/tmp/cache/data/cache/searchhub/{$this->accountName}/{$this->channelName}";
+        //return count(glob($filePath . '/*')) === 0;
+        return $this->cache === null;
     }
 }
