@@ -5,6 +5,8 @@ namespace SearchHub\Client;
 class MappingCache implements MappingCacheInterface
 {
     protected $cache; //TODO Datatyp
+    protected $accountName;
+    protected $channelName;
 
     /**
      * Get cache and save it
@@ -12,6 +14,8 @@ class MappingCache implements MappingCacheInterface
      *
      */
     public function __construct(string $accountName, string $channelName){
+        $this->accountName = $accountName;
+        $this->channelName = $channelName;
         $this->cache = SearchHubConstants::getMappingCache($accountName, $channelName);
         // TODO: load mappings from file
     }
@@ -37,6 +41,15 @@ class MappingCache implements MappingCacheInterface
 
     public function deleteCache(): void{
         $this->cache = null;
+        $filePath = "/tmp/cache/data/cache/searchhub/{$this->accountName}/{$this->channelName}";
+        if (!is_dir($filePath)) return;
+        $dir = opendir($filePath);
+        while (false !== ($file = readdir($dir))) {
+            if ($file === '.' || $file === '..') continue;
+            $fullPath = $filePath . '/' . $file;
+            if (is_file($fullPath)) unlink($fullPath);
+        }
+        closedir($dir);
     }
 
     public function loadCache(array $loadedCache): void{
@@ -50,6 +63,7 @@ class MappingCache implements MappingCacheInterface
 
     public function isEmpty(): bool
     {
-        return boolval($this->cache);
+        $filePath = "/tmp/cache/data/cache/searchhub/{$this->accountName}/{$this->channelName}";
+        return count(glob($filePath . '/*')) === 0;
     }
 }
