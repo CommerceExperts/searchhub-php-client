@@ -20,11 +20,10 @@ interface MappingCacheInterface
     /**
      * Rewrite cache
      *
-     * @param void//TODO
-     *
+     * @param array $loadedCache in form [$query => {"masterQuery" => "", "redirect" => ""}]
      * @return void
      */
-    public function loadCache(string $loadedCache): void;
+    public function loadCache(array $loadedCache): void;
 
     //Check if there is cache?
     public function isEmpty(): bool;

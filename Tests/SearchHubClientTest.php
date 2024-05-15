@@ -1,9 +1,9 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use SearchHub\Client\SearchHubClient2;
+use SearchHub\Client\SearchHubClient;
 use SearchHub\Client\SearchHubConstants;
-class SearchHubClient2Test extends TestCase {
+class SearchHubClientTest extends TestCase {
 
 
     public function testStandardClientUsage() {
@@ -14,9 +14,9 @@ class SearchHubClient2Test extends TestCase {
             "stage" => "qa"
         );
 
-        $client = new SearchHubClient2($config);
-        $mappedQuery = $client->mapQuery("vinylclick");
-        $this->assertEquals("click-vinyl", $mappedQuery);
+        $client = new SearchHubClient($config);
+        $this->assertEquals("click-vinyl", $client->mapQuery("vinil click"));
+        $this->assertNull($client->mapQuery("aboba"));
     }
 
 }

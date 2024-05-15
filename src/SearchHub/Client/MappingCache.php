@@ -2,75 +2,91 @@
 
 namespace SearchHub\Client;
 
+use Twig\Cache\FilesystemCache;
+
 class MappingCache implements MappingCacheInterface
 {
-    protected $cache; //TODO Datatyp
-    protected $accountName;
-    protected $channelName;
+    /**
+     * @var FilesystemCache|null
+     */
+    protected $cache;
 
     /**
-     * Get cache and save it
-     *
-     *
+     * @var string
+     */
+    //protected $folderPath;
+
+    /**
+     * @var string|null
+     */
+    protected $key;
+
+    /**
+     * Searching locale cache
      */
     public function __construct(string $accountName, string $channelName){
-        $this->accountName = $accountName;
-        $this->channelName = $channelName;
-        $this->cache = null;
+        //$this->folderPath = "/tmp/cache/data/cache/searchhub/{$accountName}/{$channelName}";
+
         $this->cache = SearchHubConstants::getMappingCache($accountName, $channelName);
+        $this->setKey($this->cache->generateKey($accountName, $channelName));
 
-        // TODO: load mappings from file
+        // TODO: if cache is too old (> MAX_TTL), then delete
+
+
+        //$this->cache = $this->getCache($this->key);
     }
 
-
-    /**
-     * Get Query by sending it to searchhub checking whether there is a better performing
-     * variant of the same search
-     *
-     * @param string $query
-     *
-     *
-     */
-    public function get(string $query): string
+    private function setKey($key): MappingCache
     {
-        $this->cache->generateKey($query);   //$this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
-        if (isset($mappings[$query])) {
-            $mapping = $mappings[$query];
-            return $mapping["masterQuery"];
-        }
-        return "";
+        $this->key = $key;
+        return $this;
     }
 
-    public function deleteCache(): void{
-        $this->cache = null;
-        $filePath = "/tmp/cache/data/cache/searchhub/{$this->accountName}/{$this->channelName}";
-        if (!is_dir($filePath)) return;
-        $dir = opendir($filePath);
-        while (false !== ($file = readdir($dir))) {
-            if ($file === '.' || $file === '..') continue;
-            $fullPath = $filePath . '/' . $file;
-            if (is_file($fullPath)) unlink($fullPath);
-        }
-        closedir($dir);
+    public function searchQuery(array $mappings, string $query){
+        return array_key_exists($query, $mappings) ? $mappings[$query]["masterQuery"] : null;
     }
 
-    public function loadCache(array $loadedCache): void{
-        //$this->cache = $loadedCache;
-        foreach ($loadedCache as $key => $value) {
-            $this->cache->write($key, $value);
-        }
-
-    }
-
-    public function getCache(): \Twig\Cache\FilesystemCache
+    public function get(string $query): ?string
     {
-        return $this->cache;
+        $mappings = $this->getCache($this->key);
+        return $this->searchQuery($mappings, $query);
     }
+
+    private function getCache(string $cacheFile)
+    {
+        if (file_exists($cacheFile) ) {
+            //if (time() - filemtime($cacheFile) < SearchHubConstants::MAPPING_CACHE_TTL) {
+                return json_decode(file_get_contents($cacheFile), true);
+            //}
+        }
+        return null;
+    }
+
+    public function deleteCache(): void
+    {
+        if (file_exists($this->key)) {
+            unlink($this->key);
+        }
+
+    }
+
+    public function loadCache(array $loadedCache): void
+    {
+        $this->cache->write($this->key, json_encode($loadedCache));
+    }
+
+
 
     public function isEmpty(): bool
     {
-        //$filePath = "/tmp/cache/data/cache/searchhub/{$this->accountName}/{$this->channelName}";
-        //return count(glob($filePath . '/*')) === 0;
-        return $this->cache === null;
+        return $this->cache->getTimestamp($this->key) === 0;
     }
+
+    public function age(): int {
+        if (file_exists($this->key)) {
+            return time() -$this->cache->getTimestamp($this->key);
+        }
+        return 0;
+    }
+
 }

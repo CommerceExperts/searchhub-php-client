@@ -2,18 +2,18 @@
 
 namespace SearchHub\Client;
 
+
 use Exception;
+use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Psr7\Response;
-
 
 /**
  * Class SearchHubClient
  * @package SearchHub\Client
  */
-class SearchHubClient implements SearchHubClientInterface
-{
+class SearchHubClient {
+
     /**
      * @var ClientInterface
      */
@@ -40,13 +40,14 @@ class SearchHubClient implements SearchHubClientInterface
     protected $stage;
 
     /**
-     * @var MappingCacheInterface
+     * @var MappingCache
      */
-    protected $mappingCache;
+    protected $cache;
 
-    public function setClientApiKey($apiKey): ?SearchHubClient
+
+    public function setClientApiKey($clientApiKey): ?SearchHubClient
     {
-        $this->apiKey = $apiKey;
+        $this->clientApiKey = $clientApiKey;
         return $this;
     }
 
@@ -94,6 +95,8 @@ class SearchHubClient implements SearchHubClientInterface
         return $this;
     }
 
+
+
     /**
      * @return string|null
      */
@@ -102,107 +105,6 @@ class SearchHubClient implements SearchHubClientInterface
         return $this->stage;
     }
 
-    /**
-     * @param string $arg1
-     * @param string|null $accountName
-     * @param string|null $channelName
-     * @param string|null $stage
-     * @return $this
-     * @throws Exception
-     */
-
-    public function __construct(string $arg1, string $accountName = null, string $channelName = null, string $stage = null)
-    {// Overloading of constructor
-        if ($arg1 and !($accountName or $channelName or $stage)) {
-            $jsonPath = $arg1;
-
-            $jsonString = file_get_contents($jsonPath);
-
-            $data = json_decode($jsonString, true);
-            if (isset($data['apiKey'])) {
-                $this->setClientApiKey($data['apiKey']);
-            }
-            if (isset($data['accountName'])) {
-                $this->setAccountName($data['accountName']);
-            }
-            if (isset($data['channelName'])) {
-                $this->setChannelName($data['channelName']);
-            }
-            if (isset($data['stage'])) {
-                $this->setStage($data['stage']);
-            }
-        } else {
-            // 2+ argument - parameters of client
-            $clientApiKey = $arg1;
-            $this->setClientApiKey($clientApiKey);
-            $this->setAccountName($accountName);
-            $this->setChannelName($channelName);
-            $this->setStage($stage);
-        }
-
-        $this->mappingCache = new MappingCache($this->accountName, $this->channelName);
-        //$this->mappingCache->deleteCache(); //TODO DELETE IN FUTURE
-        if ($this->mappingCache->isEmpty()) {
-            $mappings = $this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
-            $this->mappingCache->loadCache($mappings);
-        }
-    }
-
-    public function __toString()
-    {
-        return "clientApiKey: " . $this->getClientApiKey() . " | accountName: " . $this->getAccountName() . " | channelName: " . $this->channelName . " | stage: $this->stage\n";
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function optimize(SearchHubRequest $searchHubRequest): SearchHubRequest
-    {
-        $startTimestamp = microtime(true);
-        //$mapping = $this->mappingCache->get($searchHubRequest->getUserQuery());
-
-//        $mappings = $this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
-//        if (isset($mappings[$searchHubRequest->getUserQuery()]) ) {
-//            $mapping = $mappings[$searchHubRequest->getUserQuery()];
-//
-//        //if ($mapping != null ) {
-        $userQuery = $searchHubRequest->getUserQuery();
-        $mapping = $this->mappingCache->get($userQuery);
-        if (isset($mapping["redirect"])) {
-            if (strpos($mapping["redirect"], 'http') === 0) {
-                //TODO: log
-                header('Location: ' . $mapping["redirect"]);
-            } else {
-                //TODO: log
-                header('Location: ' . SearchHubConstants::REDIRECTS_BASE_URL . $mapping["redirect"]);
-            }
-            $this->report(
-                $searchHubRequest->getUserQuery(),
-                $mapping,
-                microtime(true) - $startTimestamp,
-                true
-            );
-            exit;
-        } else {
-            //TODO: log
-            $searchHubRequest->setSearchQuery($mapping);
-            $this->report(
-                $searchHubRequest->getUserQuery(),
-                $mapping,
-                microtime(true) - $startTimestamp,
-                false
-            );
-        }
-        return $searchHubRequest;
-    }
-
-    /**
-     * Get Http Client
-     *
-     * @throws Exception
-     *
-     * @return ClientInterface
-     */
     protected function getHttpClient(): ClientInterface
     {
         if ($this->httpClient === null) {
@@ -213,55 +115,6 @@ class SearchHubClient implements SearchHubClientInterface
         return $this->httpClient;
     }
 
-    /**
-     * @return array
-     * @throws Exception
-     */
-    protected function loadMappings(string $uri): array
-    {
-        $cache = SearchHubConstants::getMappingCache($this->accountName, $this->channelName);
-        $cacheFileName = $cache->generateKey("SearchHubClient", $uri);
-
-        /**
-         * @type string
-         */
-        $mappings = $this->loadMappingsFromCache($cacheFileName);
-        if ($mappings === null ) {
-            try {
-                $mappingsResponse = $this->getHttpClient()->get($uri, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
-                assert($mappingsResponse instanceof Response);
-                $indexedMappings = $this->indexMappings(json_decode($mappingsResponse->getBody()->getContents(), true));
-                $cache->write($cacheFileName, json_encode($indexedMappings));
-                return $indexedMappings;
-            } catch (Exception $e) {
-                //TODO: log
-                return array();
-            }
-        }
-        return json_decode($mappings, true);
-    }
-
-    protected function loadMappingsFromCache(string $cacheFile)
-    {
-        if (file_exists($cacheFile) ) {
-            if (time() - filemtime($cacheFile) < SearchHubConstants::MAPPING_CACHE_TTL) {
-                return file_get_contents($cacheFile);
-            } else {
-                $lastModifiedResponse = $this->getHttpClient()->get(SearchHubConstants::getMappingLastModifiedEndpoint($this->accountName, $this->channelName, $this->stage), ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
-                assert($lastModifiedResponse instanceof Response);
-                if (filemtime($cacheFile) > ((int)($lastModifiedResponse->getBody()->getContents()) / 1000 + SearchHubConstants::MAPPING_CACHE_TTL)) {
-                    touch($cacheFile);
-                    return file_get_contents($cacheFile);
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @param $mappingsRaw
-     * @return array
-     */
     protected function indexMappings($mappingsRaw): array
     {
         $indexedMappings = array();
@@ -279,8 +132,44 @@ class SearchHubClient implements SearchHubClientInterface
         return $indexedMappings;
     }
 
+    public function __construct(array $config)
+    {
+        if (isset($config['clientApiKey'])) {
+            $this->setClientApiKey($config['clientApiKey']);
+        }
+        if (isset($config['accountName'])) {
+            $this->setAccountName($config['accountName']);
+        }
+        if (isset($config['channelName'])) {
+            $this->setChannelName($config['channelName']);
+        }
+        if (isset($config['stage'])) {
+            $this->setStage($config['stage']);
+        }
 
-    /**
+        $this->cache = new MappingCache($this->getAccountName(), $this->getChannelName());
+
+        //$this->cache->deleteCache();
+        if ($this->cache->isEmpty() || $this->cache->age() > SearchHubConstants::MAPPING_CACHE_TTL ){
+            $uri = SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage);
+            try {
+                $mappingsResponse = $this->getHttpClient()->get($uri, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
+                assert($mappingsResponse instanceof Response);
+                $indexedMappings = $this->indexMappings(json_decode($mappingsResponse->getBody()->getContents(), true));
+                $this->cache->loadCache($indexedMappings);
+                //$indexedMappings - true mappings;
+            } catch (Exception $e) {
+                //TODO: log
+            }
+        }
+    }
+
+    public function mapQuery(string $query) : ?string
+    {
+        return $this->cache->get($query);
+    }
+
+ /**
      * @param string $originalSearchString
      * @param string $optimizedSearchString
      * @param float $duration
@@ -289,48 +178,49 @@ class SearchHubClient implements SearchHubClientInterface
      * @return void
      * @throws Exception
      */
-    protected function report(
+        protected function report(
             string $originalSearchString,
             string $optimizedSearchString,
             float $duration,
             bool $redirect
         ): void {
-        $event = sprintf(
-            '[
-                {
-                    "from": "%s",
-                    "to": "%s",
-                    "redirect": "%s",
-                    "durationNs": %d,
-                    "tenant": {
-                        "name": "%s",
-                        "channel": "%s"
-                    },
-                    "queryMapperType": "SimpleQueryMapper",
-                    "statsType": "mappingStats",
-                    "libVersion": "php-client 1.0"
-                }
-            ]',
-            $originalSearchString,
-            $optimizedSearchString,
-            $redirect,
-            $duration * 1000 * 1000 * 1000,
-            $this->accountName,
-            $this->channelName
-        );
-        if ($optimizedSearchString){
-            echo $event;
-            $this->getHttpClient()->requestAsync(
-                'post',
-            SearchHubConstants::getMappingDataStatsEndpoint($this->stage),
-            [
-                'headers' => [
-                    'apikey' => $this->clientApiKey,
-                    'Content-Type' => 'application/json',
-                ],
-                'body' => $event,
-            ]
+            $event = sprintf(
+                '[
+                    {
+                        "from": "%s",
+                        "to": "%s",
+                        "redirect": "%s",
+                        "durationNs": %d,
+                        "tenant": {
+                            "name": "%s",
+                            "channel": "%s"
+                        },
+                        "queryMapperType": "SimpleQueryMapper",
+                        "statsType": "mappingStats",
+                        "libVersion": "php-client 1.0"
+                    }
+                ]',
+                $originalSearchString,
+                $optimizedSearchString,
+                $redirect,
+                $duration * 1000 * 1000 * 1000,
+                $this->accountName,
+                $this->channelName
             );
+            if ($optimizedSearchString){
+                echo $event;
+                $this->getHttpClient()->requestAsync(
+                    'post',
+                    SearchHubConstants::getMappingDataStatsEndpoint($this->stage),
+                    [
+                        'headers' => [
+                            'apikey' => $this->clientApiKey,
+                            'Content-Type' => 'application/json',
+                        ],
+                        'body' => $event,
+                    ]
+                );
+            }
         }
-    }
+
 }

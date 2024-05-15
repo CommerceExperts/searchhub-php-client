@@ -3,7 +3,6 @@
 require_once 'vendor/autoload.php';
 
 use SearchHub\Client\SearchHubClient;
-use SearchHub\Client\SearchHubClient2;
 use SearchHub\Client\SearchHubConstants;
 use SearchHub\Client\SearchHubRequest;
 
@@ -41,7 +40,7 @@ $test = array ("vinil click", "sichtschuztzäune", "klick-vinyl", "aboba", "sich
 
 foreach ($test as $query)
 {
-    $client = new SearchHubClient2($config);
+    $client = new SearchHubClient($config);
     $mappedQuery = $client->mapQuery($query);
     echo $query . " -> " . $mappedQuery . "\n";
 }
