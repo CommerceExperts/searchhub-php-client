@@ -58,6 +58,15 @@ class MappingCache2 implements MappingCacheInterface
      *
      *
      */
+
+    public function mappimgsToV1(array $mappings){
+        $mappingsV1 = array();
+        foreach($mappings as $query => $secondArray){
+            $mappingsV1[$query] = $secondArray["masterQuery"];
+        }
+        return $mappingsV1;
+    }
+
     public function get(string $query): string
     { // TODO Searching query in cache
 //        $this->cache->generateKey($query);   //$this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
@@ -66,9 +75,11 @@ class MappingCache2 implements MappingCacheInterface
 //            return $mapping["masterQuery"];
 //        }
         $mappings = $this->getCache($this->key);
+        $mappingsV1 = $this->mappimgsToV1($mappings);
+
         //$mapping = Searching query in mapping
         //return $mapping;
-        return "";
+        return $mappingsV1[$query];
     }
 
     public function getCache(string $cacheFile)
