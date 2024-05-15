@@ -220,15 +220,18 @@ class SearchHubClient implements SearchHubClientInterface
     protected function loadMappings(string $uri): array
     {
         $cache = SearchHubConstants::getMappingCache($this->accountName, $this->channelName);
-        $key = $cache->generateKey("SearchHubClient", $uri);
+        $cacheFileName = $cache->generateKey("SearchHubClient", $uri);
 
-        $mappings = $this->loadMappingsFromCache($key);
+        /**
+         * @type string
+         */
+        $mappings = $this->loadMappingsFromCache($cacheFileName);
         if ($mappings === null ) {
             try {
                 $mappingsResponse = $this->getHttpClient()->get($uri, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
                 assert($mappingsResponse instanceof Response);
                 $indexedMappings = $this->indexMappings(json_decode($mappingsResponse->getBody()->getContents(), true));
-                $cache->write($key, json_encode($indexedMappings));
+                $cache->write($cacheFileName, json_encode($indexedMappings));
                 return $indexedMappings;
             } catch (Exception $e) {
                 //TODO: log
