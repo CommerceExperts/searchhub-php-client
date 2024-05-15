@@ -24,7 +24,7 @@ interface MappingCacheInterface
      *
      * @return void
      */
-    public function loadCache(array $loadedCache): void;
+    public function loadCache(string $loadedCache): void;
 
     //Check if there is cache?
     public function isEmpty(): bool;

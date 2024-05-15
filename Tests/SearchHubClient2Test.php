@@ -10,7 +10,7 @@ class SearchHubClient2Test extends TestCase {
         $config = array(
             "clientApiKey" => SearchHubConstants::API_KEY,
             "accountName" => "test",
-            "setChannelName" => "working",
+            "channelName" => "working",
             "stage" => "qa"
         );
 

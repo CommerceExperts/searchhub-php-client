@@ -158,32 +158,32 @@ class SearchHubClient2 {
             $this->setStage($config['stage']);
         }
 
-        $this->cache = new MappingCache2($this->accountName, $this->channelName);
+        $this->cache = new MappingCache2($this->getAccountName(), $this->getChannelName());
 
 
         if ($this->cache->isEmpty()){
+
             //TODO Cheak, how old is cache
+
             $uri = SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage);
             try {
                 $mappingsResponse = $this->getHttpClient()->get($uri, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
                 assert($mappingsResponse instanceof Response);
                 $indexedMappings = $this->indexMappings(json_decode($mappingsResponse->getBody()->getContents(), true));
                 $this->cache->loadCache(json_encode($indexedMappings));
-                return $indexedMappings;
+                //$indexedMappings - true mappings;
             } catch (Exception $e) {
                 //TODO: log
                 return array();
             }
         }
 
-
-
+        //Now key is true
     }
 
     public function mapQuery($query) :string
     {
-
-        return "test";
+        return $this->cache->get($query);
     }
 
 

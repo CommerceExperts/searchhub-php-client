@@ -14,7 +14,7 @@ class MappingCache2 implements MappingCacheInterface
     /**
      * @var string
      */
-    protected $folderPath;
+    //protected $folderPath;
 
     /**
      * @var string|null
@@ -25,24 +25,26 @@ class MappingCache2 implements MappingCacheInterface
      * Searching locale cache
      */
     public function __construct(string $accountName, string $channelName){
-        $this->folderPath = "/tmp/cache/data/cache/searchhub/{$accountName}/{$channelName}";
+        //$this->folderPath = "/tmp/cache/data/cache/searchhub/{$accountName}/{$channelName}";
 
         $this->cache = SearchHubConstants::getMappingCache($accountName, $channelName);
         $this->setKey($this->cache->generateKey($accountName, $channelName));
 
-        $this->cache = $this->getCache($this->key);
+        //$this->cache = $this->getCache($this->key);
     }
 
-    public function setKey($key): ?SearchHubClient2
+
+
+    public function setKey($key): MappingCache2
     {
         $this->key = $key;
         return $this;
     }
 
     /**
-     * @return MappingCache|null
+     * @return MappingCache2|null
      */
-    public function getKey(): ?MappingCache
+    public function getKey(): ?MappingCache2
     {
         return $this->key;
     }
@@ -63,17 +65,20 @@ class MappingCache2 implements MappingCacheInterface
 //            $mapping = $mappings[$query];
 //            return $mapping["masterQuery"];
 //        }
+        $mappings = $this->getCache($this->key);
+        //$mapping = Searching query in mapping
+        //return $mapping;
         return "";
     }
 
     public function getCache(string $cacheFile)
     {
         if (file_exists($cacheFile) ) {
-            if (time() - filemtime($cacheFile) < SearchHubConstants::MAPPING_CACHE_TTL) {
+            //TODO REMOVE if (time() - filemtime($cacheFile) < SearchHubConstants::MAPPING_CACHE_TTL) {
                 //return file_get_contents($cacheFile);
                 return json_decode(file_get_contents($cacheFile), true);
             }
-        }
+        //TODO REMOVE }
         return null;
     }
 
@@ -83,7 +88,7 @@ class MappingCache2 implements MappingCacheInterface
         $this->cache = null;
     }
 
-    public function loadCache(array $loadedCache): void
+    public function loadCache(string $loadedCache): void
     {
         $this->cache->write($this->key, $loadedCache);
     }

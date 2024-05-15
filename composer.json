@@ -9,7 +9,6 @@
     "twig/twig": "^3.0",
     "guzzlehttp/guzzle": "^7.8",
     "ext-json": "*",
-    "sqlite3/sqlite3": "^1.0",
     "ext-pdo": "*"
   },
   "require-dev": {
