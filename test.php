@@ -37,8 +37,15 @@ $config = array(
     "stage" => "qa"
 );
 
-$client = new SearchHubClient2($config);
-$mappedQuery = $client->mapQuery("vinylclick");
+$test = array ("vinil click", "sichtschuztzäune", "klick-vinyl", "aboba", "sichtschutz zaune");
+
+foreach ($test as $query)
+{
+    $client = new SearchHubClient2($config);
+    $mappedQuery = $client->mapQuery($query);
+    echo $query . " -> " . $mappedQuery . "\n";
+}
+
 
 
 //?

@@ -3,6 +3,7 @@
 namespace SearchHub\Client;
 
 
+use Exception;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
@@ -94,19 +95,7 @@ class SearchHubClient2 {
         return $this;
     }
 
-    /**
-     * @return MappingCache|null
-     */
-    public function getCache(): ?MappingCache
-    {
-        return $this->cache;
-    }
 
-    public function setCache($stage = null): ?SearchHubClient2
-    {
-        $this->stage = ($stage === "qa") ? "qa" : "prod";
-        return $this;
-    }
 
     /**
      * @return string|null
@@ -160,7 +149,7 @@ class SearchHubClient2 {
 
         $this->cache = new MappingCache2($this->getAccountName(), $this->getChannelName());
 
-
+        $this->cache->deleteCache();
         if ($this->cache->isEmpty()){
 
             //TODO Cheak, how old is cache
@@ -177,11 +166,9 @@ class SearchHubClient2 {
                 return array();
             }
         }
-
-        //Now key is true
     }
 
-    public function mapQuery($query) :string
+    public function mapQuery($query) : ?string
     {
         return $this->cache->get($query);
     }

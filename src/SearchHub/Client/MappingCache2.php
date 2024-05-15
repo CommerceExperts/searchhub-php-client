@@ -2,6 +2,7 @@
 
 namespace SearchHub\Client;
 
+use http\QueryString;
 use Twig\Cache\FilesystemCache;
 
 class MappingCache2 implements MappingCacheInterface
@@ -44,59 +45,43 @@ class MappingCache2 implements MappingCacheInterface
     /**
      * @return MappingCache2|null
      */
-    public function getKey(): ?MappingCache2
+    public function getKey(): ?string
     {
         return $this->key;
     }
 
-
-    /**
-     * Get Query by sending it to searchhub checking whether there is a better performing
-     * variant of the same search
-     *
-     * @param string $query
-     *
-     *
-     */
-
-    public function mappimgsToV1(array $mappings){
-        $mappingsV1 = array();
-        foreach($mappings as $query => $secondArray){
-            $mappingsV1[$query] = $secondArray["masterQuery"];
+    public function searchQuery(array $mappings, string $query){
+        foreach($mappings as $neededQuery => $secondArray){
+            if ($neededQuery === $query)
+            {
+                return $secondArray["masterQuery"];
+            }
         }
-        return $mappingsV1;
+        return null;
     }
 
-    public function get(string $query): string
-    { // TODO Searching query in cache
-//        $this->cache->generateKey($query);   //$this->loadMappings(SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage));
-//        if (isset($mappings[$query])) {
-//            $mapping = $mappings[$query];
-//            return $mapping["masterQuery"];
-//        }
+    public function get(string $query): ?string
+    {
         $mappings = $this->getCache($this->key);
-        $mappingsV1 = $this->mappimgsToV1($mappings);
-
-        //$mapping = Searching query in mapping
-        //return $mapping;
-        return $mappingsV1[$query];
+        return $this->searchQuery($mappings, $query);
     }
 
     public function getCache(string $cacheFile)
     {
         if (file_exists($cacheFile) ) {
-            //TODO REMOVE if (time() - filemtime($cacheFile) < SearchHubConstants::MAPPING_CACHE_TTL) {
-                //return file_get_contents($cacheFile);
+            //if (time() - filemtime($cacheFile) < SearchHubConstants::MAPPING_CACHE_TTL) {
                 return json_decode(file_get_contents($cacheFile), true);
-            }
-        //TODO REMOVE }
+            //}
+        }
         return null;
     }
 
     public function deleteCache(): void
     {
-        $this->cache->write($this->key, null);
-        $this->cache = null;
+        if (file_exists($this->key)) {
+            unlink($this->key);
+        }
+
     }
 
     public function loadCache(string $loadedCache): void
