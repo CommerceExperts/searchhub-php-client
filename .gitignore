@@ -1,3 +1,4 @@
 /searchhub-php-client.tar.gz
 /.idea/
 vendor/
+src/SearchHub/Client/SearchHubConstants.php
