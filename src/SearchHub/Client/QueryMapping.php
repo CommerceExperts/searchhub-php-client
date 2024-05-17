@@ -19,7 +19,6 @@ class QueryMapping {
     public ?string $redirect;
 
 
-
     /**
      * Gets the search query.
      *

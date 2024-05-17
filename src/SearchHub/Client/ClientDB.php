@@ -8,11 +8,12 @@ use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 
+
 /**
  * Class SearchHubClient
  * @package SearchHub\Client
  */
-class SearchHubClient {
+class ClientDB {
 
     /**
      * @var ClientInterface
@@ -42,10 +43,10 @@ class SearchHubClient {
     /**
      * @var MappingCache
      */
-    protected $cache;
+    protected $db;
 
 
-    public function setClientApiKey($clientApiKey): ?SearchHubClient
+    public function setClientApiKey($clientApiKey): ?ClientDB
     {
         $this->clientApiKey = $clientApiKey;
         return $this;
@@ -59,7 +60,7 @@ class SearchHubClient {
         return $this->clientApiKey;
     }
 
-    public function setAccountName($accountName): ?SearchHubClient
+    public function setAccountName($accountName): ?ClientDB
     {
         $this->accountName = $accountName;
         return $this;
@@ -75,7 +76,7 @@ class SearchHubClient {
     }
 
 
-    public function setChannelName($channelName): ?SearchHubClient
+    public function setChannelName($channelName): ?ClientDB
     {
         $this->channelName = $channelName;
         return $this;
@@ -89,13 +90,11 @@ class SearchHubClient {
         return $this->channelName;
     }
 
-    public function setStage($stage = null): ?SearchHubClient
+    public function setStage($stage = null): ?ClientDB
     {
         $this->stage = ($stage === "qa") ? "qa" : "prod";
         return $this;
     }
-
-
 
     /**
      * @return string|null
@@ -124,9 +123,9 @@ class SearchHubClient {
                     $indexedMappings[$variant] = array();
                     $indexedMappings[$variant]["masterQuery"] = $mapping["masterQuery"];
                     $indexedMappings[$variant]["redirect"] = $mapping["redirect"];
-                    }
                 }
             }
+        }
         return $indexedMappings;
     }
 
@@ -145,27 +144,21 @@ class SearchHubClient {
             $this->setStage($config['stage']);
         }
 
-        $this->cache = new MappingCache($this->getAccountName(), $this->getChannelName());
+        $this->db = new DB();
 
+        //$this->db->deleteDB(); //Delete local DB
 
-        //$this->cache->deleteCache(); //Delete local cache
-
-        if ($this->cache->isEmpty() || $this->cache->age() > SearchHubConstants::MAPPING_CACHE_TTL ){
+        if ($this->db->isEmpty()){
             $uri = SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage);
             try {
                 $mappingsResponse = $this->getHttpClient()->get($uri, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
                 assert($mappingsResponse instanceof Response);
                 $indexedMappings = $this->indexMappings(json_decode($mappingsResponse->getBody()->getContents(), true));
-                $this->cache->loadCache($indexedMappings);
+                $this->db->loadDB($indexedMappings);
             } catch (Exception $e) {
                 //TODO: log
             }
         }
-    }
-
-    public function mapQuery(string $query) : QueryMapping
-    {
-        return $this->cache->get($query);
     }
 
     /**
@@ -183,12 +176,15 @@ class SearchHubClient {
             $mappedQuery->redirect
 
         );
-
         return $mappedQuery;
-
     }
 
- /**
+    public function mapQuery(string $query) : QueryMapping
+    {
+        return $this->db->get($query);
+    }
+
+    /**
      * @param string $originalSearchString
      * @param string|null $optimizedSearchString
      * @param float $duration
@@ -198,13 +194,13 @@ class SearchHubClient {
      * @throws Exception
      */
     protected function report(
-            string $originalSearchString,
-            string|null $optimizedSearchString,
-            float $duration ,
-            string|null $redirect
-            )  : void {
-            $event = sprintf(
-                '[
+        string $originalSearchString,
+        string|null $optimizedSearchString,
+        float $duration ,
+        string|null $redirect
+    )  : void {
+        $event = sprintf(
+            '[
                     {
                         "from": "%s",
                         "to": "%s",
@@ -214,33 +210,33 @@ class SearchHubClient {
                             "name": "%s",
                             "channel": "%s"
                         },
-                        "queryMapperType": "SimpleQueryMapper",
+                        "queryMapperType": "SQLiteMapper",
                         "statsType": "mappingStats",
                         "libVersion": "php-client 1.0"
                     }
                 ]',
-                $originalSearchString,
-                $optimizedSearchString = $optimizedSearchString == null ? $originalSearchString :  $optimizedSearchString,
-                $redirect == null ? "null" : "\"$redirect\"",
-                $duration * 1000 * 1000 * 1000 ,
-                $this->accountName,
-                $this->channelName
+            $originalSearchString,
+            $optimizedSearchString = $optimizedSearchString == null ? $originalSearchString :  $optimizedSearchString,
+            $redirect == null ? "null" : "\"$redirect\"",
+            $duration * 1000 * 1000 * 1000 ,
+            $this->accountName,
+            $this->channelName
+        );
+
+        echo $event;
+
+        if ($optimizedSearchString){
+            $this->getHttpClient()->requestAsync(
+                'post',
+                SearchHubConstants::getMappingDataStatsEndpoint($this->stage),
+                [
+                    'headers' => [
+                        'apikey' => $this->clientApiKey,
+                        'Content-Type' => 'application/json',
+                    ],
+                    'body' => $event,
+                ]
             );
-
-            echo $event;
-
-            if ($optimizedSearchString){
-                $this->getHttpClient()->requestAsync(
-                    'post',
-                    SearchHubConstants::getMappingDataStatsEndpoint($this->stage),
-                    [
-                        'headers' => [
-                            'apikey' => $this->clientApiKey,
-                            'Content-Type' => 'application/json',
-                        ],
-                        'body' => $event,
-                    ]
-                );
-            }
         }
+    }
 }
