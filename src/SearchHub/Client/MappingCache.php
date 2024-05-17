@@ -29,14 +29,13 @@ class MappingCache implements MappingCacheInterface
         $this->key = $key;
     }
 
-    public function searchQuery(array $mappings, string $query){
-        return array_key_exists($query, $mappings) ? $mappings[$query]["masterQuery"] : null;
-    }
 
-    public function get(string $query): ?string
+    public function get(string $query): QueryMapping
     {
         $mappings = $this->getCache($this->key);
-        return $this->searchQuery($mappings, $query);
+        $masterQuery = array_key_exists($query, $mappings) ? $mappings[$query]["masterQuery"] : null;
+        $redirect = array_key_exists($query, $mappings) ? $mappings[$query]["redirect"] : null;
+        return new QueryMapping($query, $masterQuery, $redirect);
     }
 
     private function getCache(string $cacheFile)

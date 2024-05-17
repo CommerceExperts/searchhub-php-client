@@ -6,17 +6,18 @@ class QueryMapping {
     /**
      * @var string
      */
-    private $userQuery;
+    public string $userQuery;
 
     /**
      * @var string|null
      */
-    private $masterQuery;
+    public ?string $masterQuery;
 
     /**
      * @var string|null
      */
-    private $redirect;
+    public ?string $redirect;
+
 
 
     /**

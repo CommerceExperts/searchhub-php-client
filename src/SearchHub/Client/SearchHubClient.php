@@ -123,12 +123,11 @@ class SearchHubClient {
                 foreach ($mapping["queries"] as $variant) {
                     $indexedMappings[$variant] = array();
                     $indexedMappings[$variant]["masterQuery"] = $mapping["masterQuery"];
-                    if ($mapping["redirect"] !== null) {
-                        $indexedMappings[$variant]["redirect"] = $mapping["redirect"];
+                    //TODO What here is gut?
+                    $indexedMappings[$variant]["redirect"] = $mapping["redirect"];
                     }
                 }
             }
-        }
         return $indexedMappings;
     }
 
@@ -150,7 +149,7 @@ class SearchHubClient {
         $this->cache = new MappingCache($this->getAccountName(), $this->getChannelName());
 
 
-        //$this->cache->deleteCache();
+        $this->cache->deleteCache();
 
         if ($this->cache->isEmpty() || $this->cache->age() > SearchHubConstants::MAPPING_CACHE_TTL ){
             $uri = SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage);
@@ -159,16 +158,35 @@ class SearchHubClient {
                 assert($mappingsResponse instanceof Response);
                 $indexedMappings = $this->indexMappings(json_decode($mappingsResponse->getBody()->getContents(), true));
                 $this->cache->loadCache($indexedMappings);
-                //$indexedMappings - true mappings;
             } catch (Exception $e) {
                 //TODO: log
             }
         }
     }
 
-    public function mapQuery(string $query) : ?string
+    public function mapQuery(string $query) : QueryMapping
     {
         return $this->cache->get($query);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function optimize(string $query): QueryMapping
+    {
+        $startTimestamp = microtime(true);
+        $mappedQuery= $this->mapQuery($query);
+
+        $this->report(
+            $query,
+            $mappedQuery->masterQuery,
+            microtime(true) - $startTimestamp,
+            $mappedQuery->redirect
+
+        );
+
+        return $mappedQuery;
+
     }
 
  /**
@@ -180,18 +198,18 @@ class SearchHubClient {
      * @return void
      * @throws Exception
      */
-        protected function report(
+    protected function report(
             string $originalSearchString,
             string|null $optimizedSearchString,
             float $duration,
-            bool $redirect
-        ): void {
+            string|null $redirect
+            )  : void {
             $event = sprintf(
                 '[
                     {
                         "from": "%s",
                         "to": "%s",
-                        "redirect": "%s",
+                        "redirect": %s,
                         "durationNs": %d,
                         "tenant": {
                             "name": "%s",
@@ -203,8 +221,8 @@ class SearchHubClient {
                     }
                 ]',
                 $originalSearchString,
-                $optimizedSearchString,
-                $redirect,
+                $optimizedSearchString = $optimizedSearchString == null ? $originalSearchString :  $optimizedSearchString,
+                $redirect = $redirect == null ? "null" : "\"$redirect\"",
                 $duration * 1000 * 1000 * 1000,
                 $this->accountName,
                 $this->channelName
@@ -227,34 +245,6 @@ class SearchHubClient {
             }
         }
 
-    /**
-     * @throws Exception
-     */
-    public function optimize(string $query): void
-    {
-        $startTimestamp = microtime(true);
-        $mapping = $this->mapQuery($query);
 
-        $redirect = isset($mapping);
-
-//        if ($mapping["redirect"])
-//        {
-//            if (strpos($mapping["redirect"], 'http') === 0) {
-//                //TODO: log
-//                header('Location: ' . $mapping["redirect"]);
-//            } else {
-//                //TODO: log
-//                header('Location: ' . SearchHubConstants::REDIRECTS_BASE_URL . $mapping["redirect"]);
-//            }
-//        }
-
-        $this->report(
-            $query,
-            $mapping,
-            microtime(true) - $startTimestamp,
-            $redirect
-        );
-
-    }
 
 }
