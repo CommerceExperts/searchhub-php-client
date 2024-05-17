@@ -11,11 +11,12 @@ class DB implements MappingCacheInterface
      * @var PDO|null
      */
     protected ?PDO $db;
+    const dbName = "my_database.sqlite";
 
     public function __construct()
     {
         try {
-            $this->db = new PDO('sqlite:my_database.sqlite');
+            $this->db = new PDO('sqlite:'. $this::dbName);
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 
@@ -26,8 +27,7 @@ class DB implements MappingCacheInterface
             CREATE TABLE queries (
                 userQuery VARCHAR(255) PRIMARY KEY,
                 masterQuery VARCHAR(255),
-                redirect VARCHAR(255),
-                last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                redirect VARCHAR(255)
             )
         ";
                 $this->db->exec($createTableQuery);
@@ -75,7 +75,8 @@ class DB implements MappingCacheInterface
     public function deleteCache(): void
     {
         try {
-            $this->db->exec("DELETE FROM queries");
+            //$this->db->exec("DELETE FROM queries");
+            $this->db->exec("DROP TABLE IF EXISTS queries");
         } catch (PDOException $e) {
             //TODO log
         }
@@ -94,20 +95,8 @@ class DB implements MappingCacheInterface
 
     public function age(): int
     {
-        try {
-            $stmt = $this->db->prepare("SELECT last_updated FROM queries ORDER BY last_updated ASC LIMIT 1");
-            $stmt->bindParam(':userQuery', $query);
-            $stmt->execute();
-            $lastUpdated = $stmt->fetchColumn();
-
-            if ($lastUpdated) {
-                $currentTime = time();
-                $lastUpdatedTime = strtotime($lastUpdated);
-                return $currentTime - $lastUpdatedTime;
-            }
-
-        } catch (PDOException $e) {
-            //TODO log
+        if (file($this::dbName)){
+            return time() - filemtime($this::dbName);
         }
         return 0;
     }

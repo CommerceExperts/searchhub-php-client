@@ -25,8 +25,11 @@ $test = array ("vinil click", "sichtschuztzäune", "klick-vinyl", "aboba", "sich
 //}
 
 echo "\n\n\n-------------------------------DATA BASE-------------------------------\n";
-foreach ($test as $query)
-{
-    $client = new ClientDB($config);
-    $client->optimize($query);
-}
+//foreach ($test as $query)
+//{
+//    $client = new ClientDB($config);
+//    $client->optimize($query);
+//}
+
+$client = new ClientDB($config);
+$client->optimize("vinil click");

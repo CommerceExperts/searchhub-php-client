@@ -148,7 +148,7 @@ class ClientDB {
 
         //$this->db->deleteCache(); //Delete local DB
 
-        if ($this->db->isEmpty()){
+        if ($this->db->isEmpty() || $this->db->age() > SearchHubConstants::MAPPING_CACHE_TTL){
             $uri = SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage);
             try {
                 $mappingsResponse = $this->getHttpClient()->get($uri, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
