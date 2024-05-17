@@ -41,16 +41,7 @@ $test = array ("vinil click", "sichtschuztzäune", "klick-vinyl", "aboba", "sich
 foreach ($test as $query)
 {
     $client = new SearchHubClient($config);
-    $mappedQuery = $client->mapQuery($query);
-    echo $query . " -> " . $mappedQuery . "\n";
+    $client->optimize($query);
+//    $mappedQuery = $client->mapQuery($query);
+//    echo $query . " -> " . $mappedQuery . "\n";
 }
-
-
-
-//?
-//<?php
-//
-//echo "Hello World!\n";
-//$input = strval(fgets(STDIN));
-//
-//echo "$input\n";

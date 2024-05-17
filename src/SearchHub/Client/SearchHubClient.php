@@ -149,7 +149,9 @@ class SearchHubClient {
 
         $this->cache = new MappingCache($this->getAccountName(), $this->getChannelName());
 
+
         //$this->cache->deleteCache();
+
         if ($this->cache->isEmpty() || $this->cache->age() > SearchHubConstants::MAPPING_CACHE_TTL ){
             $uri = SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage);
             try {
@@ -180,7 +182,7 @@ class SearchHubClient {
      */
         protected function report(
             string $originalSearchString,
-            string $optimizedSearchString,
+            string|null $optimizedSearchString,
             float $duration,
             bool $redirect
         ): void {
@@ -207,8 +209,10 @@ class SearchHubClient {
                 $this->accountName,
                 $this->channelName
             );
+
+            echo $event;
+
             if ($optimizedSearchString){
-                echo $event;
                 $this->getHttpClient()->requestAsync(
                     'post',
                     SearchHubConstants::getMappingDataStatsEndpoint($this->stage),
@@ -222,5 +226,35 @@ class SearchHubClient {
                 );
             }
         }
+
+    /**
+     * @throws Exception
+     */
+    public function optimize(string $query): void
+    {
+        $startTimestamp = microtime(true);
+        $mapping = $this->mapQuery($query);
+
+        $redirect = isset($mapping);
+
+//        if ($mapping["redirect"])
+//        {
+//            if (strpos($mapping["redirect"], 'http') === 0) {
+//                //TODO: log
+//                header('Location: ' . $mapping["redirect"]);
+//            } else {
+//                //TODO: log
+//                header('Location: ' . SearchHubConstants::REDIRECTS_BASE_URL . $mapping["redirect"]);
+//            }
+//        }
+
+        $this->report(
+            $query,
+            $mapping,
+            microtime(true) - $startTimestamp,
+            $redirect
+        );
+
+    }
 
 }

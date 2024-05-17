@@ -12,10 +12,6 @@ class MappingCache implements MappingCacheInterface
     protected $cache;
 
     /**
-     * @var string
-     */
-
-    /**
      * @var string|null
      */
     protected $key;
@@ -28,10 +24,9 @@ class MappingCache implements MappingCacheInterface
         $this->setKey($this->cache->generateKey($accountName, $channelName));
     }
 
-    private function setKey($key): MappingCache
+    private function setKey($key): void
     {
         $this->key = $key;
-        return $this;
     }
 
     public function searchQuery(array $mappings, string $query){
@@ -73,7 +68,7 @@ class MappingCache implements MappingCacheInterface
 
     public function age(): int {
         if (file_exists($this->key)) {
-            return time() -$this->cache->getTimestamp($this->key);
+            return time() - $this->cache->getTimestamp($this->key);
         }
         return 0;
     }
