@@ -14,7 +14,6 @@ class MappingCache implements MappingCacheInterface
     /**
      * @var string
      */
-    //protected $folderPath;
 
     /**
      * @var string|null
@@ -25,15 +24,8 @@ class MappingCache implements MappingCacheInterface
      * Searching locale cache
      */
     public function __construct(string $accountName, string $channelName){
-        //$this->folderPath = "/tmp/cache/data/cache/searchhub/{$accountName}/{$channelName}";
-
         $this->cache = SearchHubConstants::getMappingCache($accountName, $channelName);
         $this->setKey($this->cache->generateKey($accountName, $channelName));
-
-        // TODO: if cache is too old (> MAX_TTL), then delete
-
-
-        //$this->cache = $this->getCache($this->key);
     }
 
     private function setKey($key): MappingCache
@@ -55,9 +47,7 @@ class MappingCache implements MappingCacheInterface
     private function getCache(string $cacheFile)
     {
         if (file_exists($cacheFile) ) {
-            //if (time() - filemtime($cacheFile) < SearchHubConstants::MAPPING_CACHE_TTL) {
-                return json_decode(file_get_contents($cacheFile), true);
-            //}
+            return json_decode(file_get_contents($cacheFile), true);
         }
         return null;
     }
@@ -67,7 +57,6 @@ class MappingCache implements MappingCacheInterface
         if (file_exists($this->key)) {
             unlink($this->key);
         }
-
     }
 
     public function loadCache(array $loadedCache): void
@@ -88,5 +77,4 @@ class MappingCache implements MappingCacheInterface
         }
         return 0;
     }
-
 }
