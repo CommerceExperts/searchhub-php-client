@@ -146,7 +146,7 @@ class ClientDB {
 
         $this->db = new DB();
 
-        //$this->db->deleteDB(); //Delete local DB
+        //$this->db->deleteCache(); //Delete local DB
 
         if ($this->db->isEmpty()){
             $uri = SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage);
@@ -154,7 +154,7 @@ class ClientDB {
                 $mappingsResponse = $this->getHttpClient()->get($uri, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
                 assert($mappingsResponse instanceof Response);
                 $indexedMappings = $this->indexMappings(json_decode($mappingsResponse->getBody()->getContents(), true));
-                $this->db->loadDB($indexedMappings);
+                $this->db->loadCache($indexedMappings);
             } catch (Exception $e) {
                 //TODO: log
             }

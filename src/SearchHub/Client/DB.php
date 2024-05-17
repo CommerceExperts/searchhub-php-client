@@ -5,7 +5,7 @@ namespace SearchHub\Client;
 use PDO;
 use PDOException;
 
-class DB
+class DB implements MappingCacheInterface
 {
     /**
      * @var PDO|null
@@ -26,7 +26,8 @@ class DB
             CREATE TABLE queries (
                 userQuery VARCHAR(255) PRIMARY KEY,
                 masterQuery VARCHAR(255),
-                redirect VARCHAR(255)
+                redirect VARCHAR(255),
+                last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ";
                 $this->db->exec($createTableQuery);
@@ -50,14 +51,13 @@ class DB
         return new QueryMapping($query, $result ? $result["masterQuery"] : null, $result ? $result["redirect"] : null);
     }
 
-    public function loadDB(array $loadedData): void
+    public function loadCache(array $loadedData): void
     {
-        foreach ($loadedData as $query => $arr){
+        foreach ($loadedData as $query => $arr) {
             $masterQuery = $arr["masterQuery"];
             $redirect = $arr["redirect"];
 
-            try
-            {
+            try {
                 $stmt = $this->db->prepare("
                 INSERT OR IGNORE INTO queries (userQuery, masterQuery, redirect)
                 VALUES (:userQuery, :masterQuery, :redirect)
@@ -72,7 +72,7 @@ class DB
         }
     }
 
-    public function deleteDB(): void
+    public function deleteCache(): void
     {
         try {
             $this->db->exec("DELETE FROM queries");
@@ -92,4 +92,23 @@ class DB
         }
     }
 
+    public function age(): int
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT last_updated FROM queries ORDER BY last_updated ASC LIMIT 1");
+            $stmt->bindParam(':userQuery', $query);
+            $stmt->execute();
+            $lastUpdated = $stmt->fetchColumn();
+
+            if ($lastUpdated) {
+                $currentTime = time();
+                $lastUpdatedTime = strtotime($lastUpdated);
+                return $currentTime - $lastUpdatedTime;
+            }
+
+        } catch (PDOException $e) {
+            //TODO log
+        }
+        return 0;
+    }
 }

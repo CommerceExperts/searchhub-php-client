@@ -28,7 +28,7 @@ interface MappingCacheInterface
     //Check if there is cache?
     public function isEmpty(): bool;
 
-
+    public function age(): int;
 
 
 }

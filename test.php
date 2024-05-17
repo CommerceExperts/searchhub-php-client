@@ -17,12 +17,12 @@ $config = array(
 $test = array ("vinil click", "sichtschuztzäune", "klick-vinyl", "aboba", "sichtschutz zaune");
 
 
-echo "-------------------------------CACHE-------------------------------\n";
-foreach ($test as $query)
-{
-    $client = new SearchHubClient($config);
-    $client->optimize($query);
-}
+//echo "-------------------------------CACHE-------------------------------\n";
+//foreach ($test as $query)
+//{
+//    $client = new SearchHubClient($config);
+//    $client->optimize($query);
+//}
 
 echo "\n\n\n-------------------------------DATA BASE-------------------------------\n";
 foreach ($test as $query)

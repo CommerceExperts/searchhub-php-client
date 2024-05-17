@@ -146,6 +146,7 @@ class SearchHubClient {
         }
 
         $this->cache = new MappingCache($this->getAccountName(), $this->getChannelName());
+        //$this->cache = new DB();
 
 
         //$this->cache->deleteCache(); //Delete local cache
