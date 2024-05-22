@@ -3,11 +3,9 @@
 namespace SearchHub\Client;
 
 
-use Exception;
+
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
+
 
 /**
  * Class SearchHubClient
@@ -19,7 +17,7 @@ class SearchHubClient {
 
     public function __construct(array $config)
     {
-        if ($config['type'] === "saas") {
+        if ($config['type'] === "SaaS") {
             $this->mapper = new SaaSMapper($config);
         }
         else
@@ -34,9 +32,7 @@ class SearchHubClient {
      */
     public function mapQuery(string $query) : QueryMapping
     {
-        $query = mb_strtolower($query);
+        $query = mb_strtolower($query);  // Important all letters make small
         return $this->mapper->mapQuery($query);
     }
-
-
 }

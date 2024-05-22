@@ -126,6 +126,9 @@ class LocalMapper implements SearchHubMapperInterface
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function mapQuery($userQuery): QueryMapping
     {
         $startTimestamp = microtime(true);
@@ -161,12 +164,10 @@ class LocalMapper implements SearchHubMapperInterface
 
         if ($this->httpClient === null) {
             $this->httpClient = new Client([
-                'timeout' => (float)$timeOut ? $timeOut : SearchHubConstants::REQUEST_TIMEOUT,
-            ]);
+                'timeout' => (float)$timeOut ? $timeOut : SearchHubConstants::REQUEST_TIMEOUT,]);
         }
         return $this->httpClient;
     }
-
 
     /**
      * @param string $originalSearchString
@@ -225,7 +226,6 @@ class LocalMapper implements SearchHubMapperInterface
                     'body' => $event,
                 ]
             );
-
 
             try {
                 $promise->wait();

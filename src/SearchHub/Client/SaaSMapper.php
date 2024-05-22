@@ -56,6 +56,7 @@ class SaaSMapper implements SearchHubMapperInterface
         return $this;
     }
 
+
     /**
      * @return string|null
      */
@@ -64,7 +65,8 @@ class SaaSMapper implements SearchHubMapperInterface
         return $this->accountName;
     }
 
-    public function setChannelName($channelName): SaaSMapper
+
+    public function setChannelName($channelName): LocalMapper
     {
         $this->channelName = $channelName;
         return $this;
@@ -115,7 +117,6 @@ class SaaSMapper implements SearchHubMapperInterface
      */
     public function mapQuery($userQuery): QueryMapping
     {
-        $userQuery = mb_strtolower($userQuery);
         $startTimestamp = microtime(true);
         $urlQuery = rawurlencode($userQuery);
 
@@ -124,10 +125,7 @@ class SaaSMapper implements SearchHubMapperInterface
 
         $response = $this->getHttpClient()->get($url, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
         assert($response instanceof Response);
-        $mappedQueryJSON = $response->getBody()->getContents();
-
-
-        $mappedQuery = json_decode($mappedQueryJSON, true);
+        $mappedQuery = json_decode($response->getBody()->getContents(), true);
 
         $this->report(
             $userQuery,
@@ -143,8 +141,7 @@ class SaaSMapper implements SearchHubMapperInterface
 
         if ($this->httpClient === null) {
             $this->httpClient = new Client([
-                'timeout' => (float)$timeOut ? $timeOut : SearchHubConstants::REQUEST_TIMEOUT,
-            ]);
+                'timeout' => (float)$timeOut ? $timeOut : SearchHubConstants::REQUEST_TIMEOUT,]);
         }
         return $this->httpClient;
     }
@@ -206,7 +203,6 @@ class SaaSMapper implements SearchHubMapperInterface
                     'body' => $event,
                 ]
             );
-
 
             try {
                 $promise->wait();
