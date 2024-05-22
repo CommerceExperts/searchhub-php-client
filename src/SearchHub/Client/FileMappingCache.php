@@ -4,7 +4,7 @@ namespace SearchHub\Client;
 
 use Twig\Cache\FilesystemCache;
 
-class MappingCache implements MappingCacheInterface
+class FileMappingCache implements MappingCacheInterface
 {
     /**
      * @var FilesystemCache|null

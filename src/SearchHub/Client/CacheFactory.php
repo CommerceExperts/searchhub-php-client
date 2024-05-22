@@ -75,7 +75,7 @@ class CacheFactory
         return $this->stage;
     }
 
-    public function createCache(): SQLCache|MappingCache
+    public function createCache(): SQLCache|FileMappingCache
     {
         try
         {
@@ -86,7 +86,7 @@ class CacheFactory
         catch(\Exception $e)
         {
             //If not connected to DB - use local Cache
-            return new MappingCache($this->getAccountName(), $this->getChannelName(), $this->getStage());
+            return new FileMappingCache($this->getAccountName(), $this->getChannelName(), $this->getStage());
         }
     }
 }

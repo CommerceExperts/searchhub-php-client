@@ -2,7 +2,6 @@
 
 require_once 'vendor/autoload.php';
 
-use SearchHub\Client\ClientDB;
 use SearchHub\Client\SearchHubClient;
 use SearchHub\Client\SearchHubConstants;
 
@@ -11,7 +10,8 @@ $config = array(
     "clientApiKey" => SearchHubConstants::API_KEY,
     "accountName" => "test",
     "channelName" => "working",
-    "stage" => "qa"
+    "stage" => "qa",
+    "type" => "local" //or saas
 );
 
 $test = array ("vinil click", "sichtschuztzäune", "klick-vinyl", "aboba", "sichtschutz zaune",
@@ -22,7 +22,7 @@ for($i = 1; $i <= 5; $i++){
     foreach ($test as $query)
     {
         $clientDB = new SearchHubClient($config);
-        $clientDB->optimize($query);
+        $clientDB->mapQuery($query);
     }
 }
 
