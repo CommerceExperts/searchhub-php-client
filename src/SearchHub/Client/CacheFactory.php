@@ -80,10 +80,9 @@ class CacheFactory
         try
         {
             //Try to connect to db
-            throw new Exception("DB did´t connected");
+            //throw new Exception("DB did´t connected");
             return new SQLCache($this->getAccountName(), $this->getChannelName(), $this->getStage());
         }
-
         catch(\Exception $e)
         {
             //If not connected to DB - use local Cache

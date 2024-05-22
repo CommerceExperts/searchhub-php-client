@@ -178,8 +178,7 @@ class SearchHubClient {
             $query,
             $mappedQuery->masterQuery,
             microtime(true) - $startTimestamp,
-            $mappedQuery->redirect
-
+            $mappedQuery->redirect,
         );
         return $mappedQuery;
     }
@@ -197,7 +196,7 @@ class SearchHubClient {
         string $originalSearchString,
         string|null $optimizedSearchString,
         float $duration ,
-        string|null $redirect
+        string|null $redirect,
     )  : void {
         $event = sprintf(
             '[
@@ -220,7 +219,7 @@ class SearchHubClient {
             $redirect == null ? "null" : "\"$redirect\"",
             $duration * 1000 * 1000 * 1000 ,
             $this->accountName,
-            $this->channelName
+            $this->channelName,
         );
 
             echo $event;

@@ -9,12 +9,13 @@ class MappingCache implements MappingCacheInterface
     /**
      * @var FilesystemCache|null
      */
-    protected $cache;
+    protected ?FilesystemCache $cache;
 
     /**
      * @var string|null
      */
-    protected $key;
+    protected ?string $key;
+
 
     /**
      * Searching locale cache

@@ -18,24 +18,20 @@ class SQLCache implements MappingCacheInterface
     public function __construct($accountName, $channelName, $stage)
     {
         $this->SQLName = "database.$accountName.$channelName.$stage.sqlite";
-        try {
-            $this->db = new PDO('sqlite:'. $this->SQLName);
-            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->db = new PDO('sqlite:'. $this->SQLName);
+        $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            $result = $this->db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='queries'");
-            //If table don´t exist - create
-            if ($result->fetch() === false) {
-                $createTableQuery = "
-            CREATE TABLE queries (
-                userQuery VARCHAR(255) PRIMARY KEY,
-                masterQuery VARCHAR(255),
-                redirect VARCHAR(255)
-            )
+        $result = $this->db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='queries'");
+        //If table don´t exist - create
+        if ($result->fetch() === false) {
+            $createTableQuery = "
+        CREATE TABLE queries (
+            userQuery VARCHAR(255) PRIMARY KEY,
+            masterQuery VARCHAR(255),
+            redirect VARCHAR(255)
+        )
         ";
-                $this->db->exec($createTableQuery);
-            }
-        } catch (PDOException $e) {
-            //TODO: log
+            $this->db->exec($createTableQuery);
         }
     }
 
@@ -43,14 +39,12 @@ class SQLCache implements MappingCacheInterface
     {
         $query = mb_strtolower($query);
         //Search query in DB
-        try {
-            $stmt = $this->db->prepare("SELECT * FROM queries WHERE userQuery = :userQuery");
-            $stmt->bindParam(':userQuery', $query);
-            $stmt->execute();
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            //TODO log
-        }
+
+        $stmt = $this->db->prepare("SELECT * FROM queries WHERE userQuery = :userQuery");
+        $stmt->bindParam(':userQuery', $query);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
         return new QueryMapping($query, $result ? $result["masterQuery"] : null, $result ? $result["redirect"] : null);
     }
 
@@ -63,7 +57,6 @@ class SQLCache implements MappingCacheInterface
             $masterQuery = $arr["masterQuery"];
             $redirect = $arr["redirect"];
 
-            try {
                 $stmt = $this->db->prepare("
                 INSERT OR IGNORE INTO queries (userQuery, masterQuery, redirect)
                 VALUES (:userQuery, :masterQuery, :redirect)
@@ -72,9 +65,7 @@ class SQLCache implements MappingCacheInterface
                 $stmt->bindParam(':masterQuery', $masterQuery);
                 $stmt->bindParam(':redirect', $redirect);
                 $stmt->execute();
-            } catch (PDOException $e) {
-                //TODO log
-            }
+
         }
         //commit transaction
         $this->db->commit();
@@ -84,23 +75,17 @@ class SQLCache implements MappingCacheInterface
 
     public function deleteCache(): void
     {
-        try {
+
             //$this->db->exec("DELETE FROM queries");
             $this->db->exec("DELETE FROM queries");
-        } catch (PDOException $e) {
-            //TODO log
-        }
+
     }
 
     public function isEmpty(): bool
     {
-        try {
-            $result = $this->db->query("SELECT COUNT(*) as count FROM queries");
-            $row = $result->fetch(PDO::FETCH_ASSOC);
-            return $row['count'] == 0;
-        } catch (PDOException $e) {
-            return false;
-        }
+        $result = $this->db->query("SELECT COUNT(*) as count FROM queries");
+        $row = $result->fetch(PDO::FETCH_ASSOC);
+        return $row['count'] == 0;
     }
 
     public function age(): int
