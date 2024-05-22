@@ -51,5 +51,18 @@ $test = array ("vinil click", "sichtschuztzäune", "klick-vinyl", "aboba", "sich
 //} else {
 //    echo "\n\nCache is x" . $TimeDB / $TimeCache . " times";
 //}
-$client = new SearchHubClient($config);
-$client->optimize("vinil click");
+//$client = new SearchHubClient($config);
+//$client->optimize("vinil click");
+
+$start = microtime(true);
+for($i = 1; $i <= 5; $i++){
+    foreach ($test as $query)
+    {
+        $clientDB = new SearchHubClient($config);
+        $clientDB->optimize($query);
+    }
+}
+
+$executionTime = microtime(true) -  $start;
+
+echo "\n\n\t\t1000 query:\n" . "Total time: " . $executionTime . "s\nAverage time: " . $executionTime/1000 . "s";

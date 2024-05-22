@@ -2,6 +2,7 @@
 
 namespace SearchHub\Client;
 
+use Exception;
 use PDO;
 use PDOException;
 
@@ -20,7 +21,6 @@ class SQLCache implements MappingCacheInterface
         try {
             $this->db = new PDO('sqlite:'. $this->SQLName);
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
 
             $result = $this->db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='queries'");
             //If table don´t exist - create
@@ -41,6 +41,7 @@ class SQLCache implements MappingCacheInterface
 
     public function get(string $query): QueryMapping
     {
+        $query = mb_strtolower($query);
         //Search query in DB
         try {
             $stmt = $this->db->prepare("SELECT * FROM queries WHERE userQuery = :userQuery");

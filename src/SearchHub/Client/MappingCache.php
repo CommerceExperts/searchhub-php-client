@@ -19,8 +19,8 @@ class MappingCache implements MappingCacheInterface
     /**
      * Searching locale cache
      */
-    public function __construct(string $accountName, string $channelName){
-        $this->cache = SearchHubConstants::getMappingCache($accountName, $channelName);
+    public function __construct(string $accountName, string $channelName, string $stage){
+        $this->cache = SearchHubConstants::getMappingCache($accountName, $channelName, $stage);
         $this->setKey($this->cache->generateKey($accountName, $channelName));
     }
 
@@ -32,6 +32,7 @@ class MappingCache implements MappingCacheInterface
 
     public function get(string $query): QueryMapping
     {
+        $query = mb_strtolower($query);
         $mappings = $this->getCache($this->key);
         $masterQuery = array_key_exists($query, $mappings) ? $mappings[$query]["masterQuery"] : null;
         $redirect = array_key_exists($query, $mappings) ? $mappings[$query]["redirect"] : null;

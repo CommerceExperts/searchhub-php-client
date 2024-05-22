@@ -2,22 +2,24 @@
 
 namespace SearchHub\Client;
 
+use Exception;
+
 class CacheFactory
 {
     /**
      * @var string|null
      */
-    protected $accountName;
+    protected ?string $accountName;
 
     /**
      * @var string|null
      */
-    protected $channelName;
+    protected ?string $channelName;
 
     /**
      * @var string
      */
-    protected $stage;
+    protected string $stage;
 
     public function __construct($config)
     {
@@ -78,13 +80,14 @@ class CacheFactory
         try
         {
             //Try to connect to db
-            return new SQLCache($this->accountName, $this->channelName, $this->stage);
+            throw new Exception("DB did´t connected");
+            return new SQLCache($this->getAccountName(), $this->getChannelName(), $this->getStage());
         }
 
         catch(\Exception $e)
         {
             //If not connected to DB - use local Cache
-            return new MappingCache($this->accountName, $this->channelName, $this->stage);
+            return new MappingCache($this->getAccountName(), $this->getChannelName(), $this->getStage());
         }
     }
 }
