@@ -11,7 +11,7 @@ $config = array(
     "accountName" => "test",
     "channelName" => "working",
     "stage" => "qa",
-    "type" => "local" //or saas
+    "type" => "saas" //or  local
 );
 
 $test = array ("vinil click", "sichtschuztzäune", "klick-vinyl", "aboba", "sichtschutz zaune",
@@ -21,8 +21,8 @@ $start = microtime(true);
 for($i = 1; $i <= 5; $i++){
     foreach ($test as $query)
     {
-        $clientDB = new SearchHubClient($config);
-        $clientDB->mapQuery($query);
+        $client = new SearchHubClient($config);
+        $client->mapQuery($query);
     }
 }
 
