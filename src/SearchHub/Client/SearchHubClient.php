@@ -143,7 +143,8 @@ class SearchHubClient {
             $this->setStage($config['stage']);
         }
 
-        $this->cache = new MappingCache($this->getAccountName(), $this->getChannelName());
+        $cacheFactory = new CacheFactory($config);
+        $this->cache = $cacheFactory->createCache();
 
         //$this->cache->deleteCache(); //Delete local cache
 
@@ -222,7 +223,7 @@ class SearchHubClient {
             $this->channelName
         );
 
-            //echo $event;
+            echo $event;
 
             if ($optimizedSearchString){
                 $this->getHttpClient()->requestAsync(

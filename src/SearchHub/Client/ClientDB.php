@@ -143,7 +143,7 @@ class ClientDB {
             $this->setStage($config['stage']);
         }
 
-        $this->db = new DB();
+        $this->db = new SQLCache();
 
         //$this->db->deleteCache(); //Delete local DB
 

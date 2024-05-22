@@ -5,18 +5,20 @@ namespace SearchHub\Client;
 use PDO;
 use PDOException;
 
-class DB implements MappingCacheInterface
+class SQLCache implements MappingCacheInterface
 {
     /**
      * @var PDO|null
      */
     protected ?PDO $db;
-    const dbName = "my_database.sqlite";
+    protected string $SQLName;
 
-    public function __construct()
+
+    public function __construct($accountName, $channelName, $stage)
     {
+        $this->SQLName = "database.$accountName.$channelName.$stage.sqlite";
         try {
-            $this->db = new PDO('sqlite:'. $this::dbName);
+            $this->db = new PDO('sqlite:'. $this->SQLName);
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 
@@ -76,7 +78,7 @@ class DB implements MappingCacheInterface
         //commit transaction
         $this->db->commit();
 
-        touch($this::dbName);
+        touch($this->SQLName);
     }
 
     public function deleteCache(): void
@@ -102,8 +104,8 @@ class DB implements MappingCacheInterface
 
     public function age(): int
     {
-        if (file($this::dbName)){
-            return time() - filemtime($this::dbName);
+        if (file($this->SQLName)){
+            return time() - filemtime($this->SQLName);
         }
         return 0;
     }

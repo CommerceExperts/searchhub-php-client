@@ -4,6 +4,21 @@ namespace SearchHub\Client;
 
 class CacheFactory
 {
+    /**
+     * @var string|null
+     */
+    protected $accountName;
+
+    /**
+     * @var string|null
+     */
+    protected $channelName;
+
+    /**
+     * @var string
+     */
+    protected $stage;
+
     public function __construct($config)
     {
         if (isset($config['accountName'])) {
@@ -17,7 +32,7 @@ class CacheFactory
         }
     }
 
-    public function setAccountName($accountName): ?SearchHubClient
+    public function setAccountName($accountName): CacheFactory
     {
         $this->accountName = $accountName;
         return $this;
@@ -33,7 +48,7 @@ class CacheFactory
     }
 
 
-    public function setChannelName($channelName): ?SearchHubClient
+    public function setChannelName($channelName): CacheFactory
     {
         $this->channelName = $channelName;
         return $this;
@@ -47,7 +62,7 @@ class CacheFactory
         return $this->channelName;
     }
 
-    public function setStage($stage = null): ?SearchHubClient
+    public function setStage($stage = null): CacheFactory
     {
         $this->stage = ($stage === "qa") ? "qa" : "prod";
         return $this;
@@ -56,5 +71,20 @@ class CacheFactory
     public function getStage(): ?string
     {
         return $this->stage;
+    }
+
+    public function createCache(): SQLCache|MappingCache
+    {
+        try
+        {
+            //Try to connect to db
+            return new SQLCache($this->accountName, $this->channelName, $this->stage);
+        }
+
+        catch(\Exception $e)
+        {
+            //If not connected to DB - use local Cache
+            return new MappingCache($this->accountName, $this->channelName, $this->stage);
+        }
     }
 }
