@@ -95,8 +95,6 @@ class SearchHubClient {
         return $this;
     }
 
-
-
     /**
      * @return string|null
      */
@@ -124,9 +122,9 @@ class SearchHubClient {
                     $indexedMappings[$variant] = array();
                     $indexedMappings[$variant]["masterQuery"] = $mapping["masterQuery"];
                     $indexedMappings[$variant]["redirect"] = $mapping["redirect"];
-                    }
                 }
             }
+        }
         return $indexedMappings;
     }
 
@@ -146,8 +144,6 @@ class SearchHubClient {
         }
 
         $this->cache = new MappingCache($this->getAccountName(), $this->getChannelName());
-        //$this->cache = new DB();
-
 
         //$this->cache->deleteCache(); //Delete local cache
 
@@ -184,9 +180,7 @@ class SearchHubClient {
             $mappedQuery->redirect
 
         );
-
         return $mappedQuery;
-
     }
 
  /**
@@ -199,13 +193,13 @@ class SearchHubClient {
      * @throws Exception
      */
     protected function report(
-            string $originalSearchString,
-            string|null $optimizedSearchString,
-            float $duration ,
-            string|null $redirect
-            )  : void {
-            $event = sprintf(
-                '[
+        string $originalSearchString,
+        string|null $optimizedSearchString,
+        float $duration ,
+        string|null $redirect
+    )  : void {
+        $event = sprintf(
+            '[
                     {
                         "from": "%s",
                         "to": "%s",
@@ -220,15 +214,15 @@ class SearchHubClient {
                         "libVersion": "php-client 1.0"
                     }
                 ]',
-                $originalSearchString,
-                $optimizedSearchString = $optimizedSearchString == null ? $originalSearchString :  $optimizedSearchString,
-                $redirect == null ? "null" : "\"$redirect\"",
-                $duration * 1000 * 1000 * 1000 ,
-                $this->accountName,
-                $this->channelName
-            );
+            $originalSearchString,
+            $optimizedSearchString = $optimizedSearchString == null ? $originalSearchString :  $optimizedSearchString,
+            $redirect == null ? "null" : "\"$redirect\"",
+            $duration * 1000 * 1000 * 1000 ,
+            $this->accountName,
+            $this->channelName
+        );
 
-            echo $event;
+            //echo $event;
 
             if ($optimizedSearchString){
                 $this->getHttpClient()->requestAsync(

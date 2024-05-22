@@ -73,8 +73,10 @@ class DB implements MappingCacheInterface
                 //TODO log
             }
         }
-        // commit transaction
+        //commit transaction
         $this->db->commit();
+
+        touch($this::dbName);
     }
 
     public function deleteCache(): void
@@ -104,10 +106,5 @@ class DB implements MappingCacheInterface
             return time() - filemtime($this::dbName);
         }
         return 0;
-    }
-
-    public function updateExistingTime(): void
-    {
-        touch($this::dbName);
     }
 }

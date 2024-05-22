@@ -8,7 +8,6 @@ use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 
-
 /**
  * Class SearchHubClient
  * @package SearchHub\Client
@@ -149,22 +148,26 @@ class ClientDB {
         //$this->db->deleteCache(); //Delete local DB
 
         if ($this->db->isEmpty() || $this->db->age() > SearchHubConstants::MAPPING_CACHE_TTL){
-            //$startTime = microtime(true); //TODO Remove
+            $startTime = microtime(true); //TODO Remove
             $uri = SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage);
             try {
                 $mappingsResponse = $this->getHttpClient()->get($uri, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
                 assert($mappingsResponse instanceof Response);
                 $indexedMappings = $this->indexMappings(json_decode($mappingsResponse->getBody()->getContents(), true));
                 $this->db->loadCache($indexedMappings);
-                $this->db->updateExistingTime();
             } catch (Exception $e) {
                 //TODO: log
             }
 
-            //$execution_time = (microtime(true) - $startTime) * 1000; //TODO Remove
+            $execution_time = (microtime(true) - $startTime) * 1000; //TODO Remove
 
             //echo("!!!!!Data inserting time: " . $execution_time."ms!!!!!\n"); //TODO Remove
         }
+    }
+
+    public function mapQuery(string $query) : QueryMapping
+    {
+        return $this->db->get($query);
     }
 
     /**
@@ -185,12 +188,7 @@ class ClientDB {
         return $mappedQuery;
     }
 
-    public function mapQuery(string $query) : QueryMapping
-    {
-        return $this->db->get($query);
-    }
-
-    /**
+ /**
      * @param string $originalSearchString
      * @param string|null $optimizedSearchString
      * @param float $duration
@@ -229,20 +227,20 @@ class ClientDB {
             $this->channelName
         );
 
-        echo $event;
+            //echo $event;
 
-        if ($optimizedSearchString){
-            $this->getHttpClient()->requestAsync(
-                'post',
-                SearchHubConstants::getMappingDataStatsEndpoint($this->stage),
-                [
-                    'headers' => [
-                        'apikey' => $this->clientApiKey,
-                        'Content-Type' => 'application/json',
-                    ],
-                    'body' => $event,
-                ]
-            );
+            if ($optimizedSearchString){
+                $this->getHttpClient()->requestAsync(
+                    'post',
+                    SearchHubConstants::getMappingDataStatsEndpoint($this->stage),
+                    [
+                        'headers' => [
+                            'apikey' => $this->clientApiKey,
+                            'Content-Type' => 'application/json',
+                        ],
+                        'body' => $event,
+                    ]
+                );
+            }
         }
-    }
 }
