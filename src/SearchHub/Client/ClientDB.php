@@ -149,15 +149,21 @@ class ClientDB {
         //$this->db->deleteCache(); //Delete local DB
 
         if ($this->db->isEmpty() || $this->db->age() > SearchHubConstants::MAPPING_CACHE_TTL){
+            //$startTime = microtime(true); //TODO Remove
             $uri = SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage);
             try {
                 $mappingsResponse = $this->getHttpClient()->get($uri, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
                 assert($mappingsResponse instanceof Response);
                 $indexedMappings = $this->indexMappings(json_decode($mappingsResponse->getBody()->getContents(), true));
                 $this->db->loadCache($indexedMappings);
+                $this->db->updateExistingTime();
             } catch (Exception $e) {
                 //TODO: log
             }
+
+            //$execution_time = (microtime(true) - $startTime) * 1000; //TODO Remove
+
+            //echo("!!!!!Data inserting time: " . $execution_time."ms!!!!!\n"); //TODO Remove
         }
     }
 

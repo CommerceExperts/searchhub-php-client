@@ -51,9 +51,12 @@ class DB implements MappingCacheInterface
         return new QueryMapping($query, $result ? $result["masterQuery"] : null, $result ? $result["redirect"] : null);
     }
 
-    public function loadCache(array $loadedData): void
+    public function loadCache(array $loadedCache): void
     {
-        foreach ($loadedData as $query => $arr) {
+        // Start transaction
+        $this->db->beginTransaction();
+
+        foreach ($loadedCache as $query => $arr) {
             $masterQuery = $arr["masterQuery"];
             $redirect = $arr["redirect"];
 
@@ -70,13 +73,15 @@ class DB implements MappingCacheInterface
                 //TODO log
             }
         }
+        // commit transaction
+        $this->db->commit();
     }
 
     public function deleteCache(): void
     {
         try {
             //$this->db->exec("DELETE FROM queries");
-            $this->db->exec("DROP TABLE IF EXISTS queries");
+            $this->db->exec("DELETE FROM queries");
         } catch (PDOException $e) {
             //TODO log
         }
@@ -99,5 +104,10 @@ class DB implements MappingCacheInterface
             return time() - filemtime($this::dbName);
         }
         return 0;
+    }
+
+    public function updateExistingTime(): void
+    {
+        touch($this::dbName);
     }
 }
