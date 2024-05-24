@@ -32,7 +32,15 @@ class SearchHubClient {
      */
     public function mapQuery(string $query) : QueryMapping
     {
-        $query = mb_strtolower($query);  // Important all letters make small
-        return $this->mapper->mapQuery($query);
+        echo $query . "\n";
+        if (preg_match('/".*?"/', $query))//check "\"word\"""
+        {
+            echo "skip: $query\n";
+            return new QueryMapping($query, $query, null);
+            //
+        } else {
+            $query = mb_strtolower($query);  // Important all letters make small
+            return $this->mapper->mapQuery($query);
+        }
     }
 }

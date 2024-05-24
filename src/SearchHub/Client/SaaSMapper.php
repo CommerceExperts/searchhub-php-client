@@ -36,6 +36,8 @@ class SaaSMapper implements SearchHubMapperInterface
      */
     protected $stage;
 
+    protected $baseUrl;
+
     public function setClientApiKey($clientApiKey): SaaSMapper
     {
         $this->clientApiKey = $clientApiKey;
@@ -66,7 +68,7 @@ class SaaSMapper implements SearchHubMapperInterface
     }
 
 
-    public function setChannelName($channelName): LocalMapper
+    public function setChannelName($channelName): SaaSMapper
     {
         $this->channelName = $channelName;
         return $this;
@@ -108,6 +110,8 @@ class SaaSMapper implements SearchHubMapperInterface
         if (isset($config['stage'])) {
             $this->setStage($config['stage']);
         }
+
+        $this->baseUrl = "https://{$this->stage}-saas.searchhub.io/smartquery/v2/{$this->accountName}/{$this->channelName}?userQuery=";
     }
 
 
@@ -120,19 +124,12 @@ class SaaSMapper implements SearchHubMapperInterface
         $startTimestamp = microtime(true);
         $urlQuery = rawurlencode($userQuery);
 
-        $url = "https://{$this->stage}-saas.searchhub.io/smartquery/v2/{$this->accountName}/{$this->channelName}?userQuery={$urlQuery}";
-
+        $url = $this->baseUrl . "{$urlQuery}";
 
         $response = $this->getHttpClient()->get($url, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
         assert($response instanceof Response);
         $mappedQuery = json_decode($response->getBody()->getContents(), true);
 
-        $this->report(
-            $userQuery,
-            $mappedQuery["masterQuery"],
-            microtime(true) - $startTimestamp,
-            $mappedQuery["redirect"],
-        );
         return new QueryMapping($userQuery, $mappedQuery["masterQuery"], $mappedQuery["redirect"]);
     }
 
@@ -144,71 +141,5 @@ class SaaSMapper implements SearchHubMapperInterface
                 'timeout' => (float)$timeOut ? $timeOut : SearchHubConstants::REQUEST_TIMEOUT,]);
         }
         return $this->httpClient;
-    }
-
-    /**
-     * @param string $originalSearchString
-     * @param string|null $optimizedSearchString
-     * @param float $duration
-     * @param string|null $redirect
-     *
-     * @return void
-     * @throws Exception
-     */
-    protected function report(
-        string      $originalSearchString,
-        string|null $optimizedSearchString,
-        float       $duration,
-        string|null $redirect,
-    ): void
-    {
-        $event = sprintf(
-            '[
-                    {
-                        "from": "%s",
-                        "to": "%s",
-                        "redirect": %s,
-                        "durationNs": %d,
-                        "timestampMillis" : %d,
-                        "tenant": {
-                            "name": "%s",
-                            "channel": "%s"
-                        },
-                        "queryMapperType": "SimpleQueryMapper",
-                        "statsType": "mappingStats",
-                        "libVersion": "php-client 1.0"
-                    }
-                ]',
-            $originalSearchString,
-            $optimizedSearchString == null ? $originalSearchString : $optimizedSearchString,
-            $redirect == null ? "null" : "\"$redirect\"",
-            $duration * 1000 * 1000 * 1000,
-            time() * 1000,
-            $this->accountName,
-            $this->channelName,
-        );
-
-        echo $event;
-
-        if ($optimizedSearchString) {
-
-            $promise = $this->getHttpClient((float)0.01)->requestAsync(
-                'post',
-                SearchHubConstants::getMappingDataStatsEndpoint($this->stage),
-                [
-                    'headers' => [
-                        'apikey' => $this->clientApiKey,
-                        'Content-Type' => 'application/json',
-                    ],
-                    'body' => $event,
-                ]
-            );
-
-            try {
-                $promise->wait();
-            } catch (Exception $e) {
-                //TODO log
-            }
-        }
     }
 }
