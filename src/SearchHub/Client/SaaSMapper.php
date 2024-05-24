@@ -110,8 +110,6 @@ class SaaSMapper implements SearchHubMapperInterface
         if (isset($config['stage'])) {
             $this->setStage($config['stage']);
         }
-
-        $this->baseUrl = "https://{$this->stage}-saas.searchhub.io/smartquery/v2/{$this->accountName}/{$this->channelName}?userQuery=";
     }
 
 
@@ -121,10 +119,7 @@ class SaaSMapper implements SearchHubMapperInterface
      */
     public function mapQuery($userQuery): QueryMapping
     {
-        $startTimestamp = microtime(true);
-        $urlQuery = rawurlencode($userQuery);
-
-        $url = $this->baseUrl . "{$urlQuery}";
+        $url = SearchHubConstants::getSaaSEndpoint($this->stage, $this->accountName, $this->channelName, $userQuery);//$this->baseUrl . "{$urlQuery}";
 
         $response = $this->getHttpClient()->get($url, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
         assert($response instanceof Response);
