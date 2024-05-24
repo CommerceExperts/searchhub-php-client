@@ -45,7 +45,7 @@ class SQLCache implements MappingCacheInterface
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return new QueryMapping($query, $result ? $result["masterQuery"] : null, $result ? $result["redirect"] : null);
+        return new QueryMapping($query, $result ? $result["masterQuery"] : $query, $result ? $result["redirect"] : null);
     }
 
     public function loadCache(array $loadedCache): void

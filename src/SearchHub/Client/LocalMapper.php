@@ -211,7 +211,6 @@ class LocalMapper implements SearchHubMapperInterface
             $this->channelName,
         );
 
-        echo $event;
 
         if ($optimizedSearchString) {
 

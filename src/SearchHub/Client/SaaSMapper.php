@@ -125,7 +125,8 @@ class SaaSMapper implements SearchHubMapperInterface
         assert($response instanceof Response);
         $mappedQuery = json_decode($response->getBody()->getContents(), true);
 
-        return new QueryMapping($userQuery, $mappedQuery["masterQuery"], $mappedQuery["redirect"]);
+        return new QueryMapping($userQuery, $mappedQuery["masterQuery"] ?: $userQuery,
+            $mappedQuery["redirect"] ?: null);
     }
 
     protected function getHttpClient($timeOut = null): ClientInterface
