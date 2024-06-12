@@ -75,8 +75,6 @@ class SQLCache implements MappingCacheInterface
 
     public function deleteCache(): void
     {
-
-            //$this->db->exec("DELETE FROM queries");
             $this->db->exec("DELETE FROM queries");
 
     }

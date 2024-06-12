@@ -13,6 +13,7 @@ class SearchHubClientTest extends TestCase
 {
 
     protected array $config;
+
     public function setUp(): void
     {
         $this->config = array(
@@ -23,8 +24,10 @@ class SearchHubClientTest extends TestCase
         );
     }
 
-    public function testByPanQuery1()
+    public function testByPassQuery1()
     {
+        //SaaS "vinil click" -> "vinil click"
+
         $this->config["type"] = "SaaS";
 
         $query = "\"vinil click\"";
@@ -34,8 +37,9 @@ class SearchHubClientTest extends TestCase
         $this->assertEquals(new QueryMapping("\"vinil click\"", "\"vinil click\"", null), $result);
     }
 
-    public function testByPanQuery2()
+    public function testByPassQuery2()
     {
+        // klick-vinyl -> \klick-vinyl
         $this->config["type"] = "SaaS";
 
         $query = "\\klick-vinyl";
@@ -47,37 +51,113 @@ class SearchHubClientTest extends TestCase
 
     public function testSaaSMapper()
     {
-        $this->config["type"] = "local";
+        // vinil click -> click-vinyl (SaaS mapper)
+        $this->config["type"] = "SaaS";
 
         $query = "vinil click";
         $client = new SearchHubClient($this->config);
         $result = $client->mapQuery($query);
-        $expected = new QueryMapping("vinil click", "click-vinyl", "https://duckduckgo.com/?t=ffab&q=click-vinyl&atb=v330-1&iax=images&ia=images");
+        $expected = new QueryMapping("vinil click", "click-vinyl", null);
 
         $this->assertEquals($expected, $result);
     }
 
-    public function testSQLCacheExisting()
+    public function testCacheEmptyAndYoung()
     {
         $this->config["type"] = "local";
 
+        $cacheMock = new \App\MappingCacheMock(true, false);
+        new LocalMapper($this->config,$cacheMock);
+        $this->assertTrue($cacheMock->isUpdated());
+    }
+
+    public function testCacheExistingAndYoung()
+    {
+        $this->config["type"] = "local";
+
+        $cacheMock = new \App\MappingCacheMock(false, false);
+        new LocalMapper($this->config,$cacheMock);
+        $this->assertFalse($cacheMock->isUpdated());
+    }
+
+    public function testCacheExistingAndOld()
+    {
+        $this->config["type"] = "local";
+
+        $cacheMock = new \App\MappingCacheMock(true, true);
+        new LocalMapper($this->config,$cacheMock);
+        $this->assertTrue($cacheMock->isUpdated());
+    }
+
+    public function testCacheEmptyAndOld()
+    {
+        $this->config["type"] = "local";
+
+        $cacheMock = new \App\MappingCacheMock(false, true);
+        new LocalMapper($this->config,$cacheMock);
+        $this->assertTrue($cacheMock->isUpdated());
+    }
+
+    public function testCacheSQLExist()
+    {
+        // vinil click -> click-vinyl
+
+        $this->config["type"] = "local";
         $query = "vinil click";
-        $client = new SearchHubClient($this->config);
-        $result = $client->mapQuery($query);
-        $expected = new QueryMapping("vinil click", "click-vinyl", "https://duckduckgo.com/?t=ffab&q=click-vinyl&atb=v330-1&iax=images&ia=images");
+
+        $cacheMock = new SQLCache($this->config["accountName"], $this->config["channelName"], $this->config["stage"]);
+        $mapper = new LocalMapper($this->config,$cacheMock);
+        $result = $mapper->mapQuery($query);
+        $expected = new QueryMapping("vinil click", "click-vinyl", null);
 
         $this->assertEquals($expected, $result);
     }
 
-//    public function testSQLCacheEmpty()
-//    {
-//    }
+    public function testCacheSQLEmpty()
+    {
+        // vinil click -> click-vinyl
 
-//    public function testFileMappingCacheExisting()
-//    {
-//    }
+        $this->config["type"] = "local";
+        $query = "vinil click";
 
-//    public function testFileMappingCacheEmpty()
-//    {
-//    }
+        $cacheMock = new SQLCache($this->config["accountName"], $this->config["channelName"], $this->config["stage"]);
+        $cacheMock->deleteCache();
+        $mapper = new LocalMapper($this->config,$cacheMock);
+        $result = $mapper->mapQuery($query);
+        $expected = new QueryMapping("vinil click", "click-vinyl", null);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testCacheFileExist()
+    {
+        // vinil click -> click-vinyl
+
+        $this->config["type"] = "local";
+        $query = "vinil click";
+
+        $cacheMock = new \SearchHub\Client\FileMappingCache($this->config["accountName"], $this->config["channelName"], $this->config["stage"]);
+        $mapper = new LocalMapper($this->config,$cacheMock);
+        $result = $mapper->mapQuery($query);
+        $expected = new QueryMapping("vinil click", "click-vinyl", null);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testCacheFileEmpty()
+    {
+        // vinil click -> click-vinyl
+
+        $this->config["type"] = "local";
+        $query = "vinil click";
+
+        $cacheMock = new \SearchHub\Client\FileMappingCache($this->config["accountName"], $this->config["channelName"], $this->config["stage"]);
+        $cacheMock->deleteCache();
+        $mapper = new LocalMapper($this->config,$cacheMock);
+        $result = $mapper->mapQuery($query);
+        $expected = new QueryMapping("vinil click", "click-vinyl", null);
+        $this->assertEquals($expected, $result);
+    }
 }

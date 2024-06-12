@@ -21,7 +21,7 @@ $test = array ("\"vinil click\"", "\"sichtschuztzäune\\", "\\klick-vinyl", "\"a
 
 $start = microtime(true);
 
-for($i = 1; $i <= 1; $i++){
+for($i = 1; $i <= 5; $i++){
     foreach ($test as $query)
     {
         $client = new SearchHubClient($config);
@@ -31,4 +31,4 @@ for($i = 1; $i <= 1; $i++){
 
 $executionTime = microtime(true) -  $start;
 
-echo "\n\n\t\t10 query:\n" . "Total time: " . $executionTime . "s\nAverage time: " . $executionTime/10 . "s";
+echo "\n\n\t\t35 query:\n" . "Total time: " . $executionTime . "s\nAverage time: " . $executionTime/35 . "s";

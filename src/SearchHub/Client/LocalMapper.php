@@ -2,6 +2,7 @@
 
 namespace SearchHub\Client;
 
+use App\MappingCacheMock;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
@@ -9,7 +10,7 @@ use GuzzleHttp\Psr7\Response;
 
 class LocalMapper implements SearchHubMapperInterface
 {
-    protected FileMappingCache|SQLCache $mappingCache;
+    protected FileMappingCache|SQLCache|MappingCacheMock $mappingCache;
 
     /**
      * @var ClientInterface
@@ -94,7 +95,7 @@ class LocalMapper implements SearchHubMapperInterface
         return $this->stage;
     }
 
-    public function __construct(array $config)
+    public function __construct(array $config, MappingCacheInterface $cache=null)
     {
         if (isset($config['clientApiKey'])) {
             $this->setClientApiKey($config['clientApiKey']);
@@ -109,9 +110,12 @@ class LocalMapper implements SearchHubMapperInterface
             $this->setStage($config['stage']);
         }
 
-        $cacheFactory = new CacheFactory($config);
-        $this->mappingCache = $cacheFactory->createCache();
+        if ($cache === null){
+            $cacheFactory = new CacheFactory($config);
+            $cache = $cacheFactory->createCache();
+        }
 
+        $this->mappingCache = $cache;
         if ($this->mappingCache->isEmpty() || $this->mappingCache->age() > SearchHubConstants::MAPPING_CACHE_TTL) {
             $uri = SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage);
             try {
