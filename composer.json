@@ -1,5 +1,5 @@
 {
-    "name": "vendor/package-name",
+    "name": "searchhub/phpclient",
     "type": "library",
     "description": "maps similar searches to best query",
     "keywords": ["mapping","search optimization"],
@@ -27,7 +27,7 @@
     "autoload": {
         "psr-4": {
             "SearchHub\\Client\\": "src/SearchHub/Client",
-            "App\\": "Tests/"
+            "App\\": "tests/"
         }
     },
 

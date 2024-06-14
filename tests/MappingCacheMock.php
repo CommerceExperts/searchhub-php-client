@@ -26,7 +26,7 @@ class MappingCacheMock  implements MappingCacheInterface
 
     public function deleteCache(): void
     {
-        // TODO: Implement deleteCache() method.
+        //
     }
 
     public function loadCache(array $loadedCache): void
