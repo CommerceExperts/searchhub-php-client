@@ -25,7 +25,7 @@ for($i = 1; $i <= 5; $i++){
     foreach ($test as $query)
     {
         $client = new SearchHubClient($config);
-        $client->mapQuery($query);
+        $client->mapQueСщтаry($query);
     }
 }
 

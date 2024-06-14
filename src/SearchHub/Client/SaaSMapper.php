@@ -36,7 +36,7 @@ class SaaSMapper implements SearchHubMapperInterface
      */
     protected $stage;
 
-    protected $baseUrl;
+    protected ?string $url;
 
     public function setClientApiKey($clientApiKey): SaaSMapper
     {
@@ -96,8 +96,9 @@ class SaaSMapper implements SearchHubMapperInterface
         return $this->stage;
     }
 
-    public function __construct(array $config)
+    public function __construct(array $config, $url=null)
     {
+        $this->url = null;
         if (isset($config['clientApiKey'])) {
             $this->setClientApiKey($config['clientApiKey']);
         }
@@ -110,8 +111,10 @@ class SaaSMapper implements SearchHubMapperInterface
         if (isset($config['stage'])) {
             $this->setStage($config['stage']);
         }
+        if ($url !== null){
+            $this->url = $url;
+        }
     }
-
 
     /**
      * @throws Exception
@@ -119,9 +122,14 @@ class SaaSMapper implements SearchHubMapperInterface
      */
     public function mapQuery($userQuery): QueryMapping
     {
-        $url = SearchHubConstants::getSaaSEndpoint($this->stage, $this->accountName, $this->channelName, $userQuery);//$this->baseUrl . "{$urlQuery}";
+        if ($this->url === null){
+            $this->url = SearchHubConstants::getSaaSEndpoint($this->stage, $this->accountName, $this->channelName, $userQuery);//$this->baseUrl . "{$urlQuery}";
+        } else {
+            $this->url = $this->url . $userQuery;
+        }
 
-        $response = $this->getHttpClient()->get($url, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
+
+        $response = $this->getHttpClient()->get($this->url, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
         assert($response instanceof Response);
         $mappedQuery = json_decode($response->getBody()->getContents(), true);
 
@@ -131,7 +139,6 @@ class SaaSMapper implements SearchHubMapperInterface
 
     protected function getHttpClient($timeOut = null): ClientInterface
     {
-
         if ($this->httpClient === null) {
             $this->httpClient = new Client([
                 'timeout' => (float)$timeOut ? $timeOut : SearchHubConstants::REQUEST_TIMEOUT,]);
