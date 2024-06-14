@@ -7,15 +7,7 @@ use Twig\Cache\FilesystemCache;
 
 class SearchHubConstants
 {
-    /**
-     * @var string
-     */
-    public const ACCOUNT_NAME = 'test';
 
-    /**
-     * @var string
-     */
-    public const CHANNEL_NAME = 'working';
 
     /**
      * The base url to prepend to relative redirect urls
