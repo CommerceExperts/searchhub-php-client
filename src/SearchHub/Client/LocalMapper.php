@@ -117,17 +117,9 @@ class LocalMapper implements SearchHubMapperInterface
 
         $this->mappingCache = $cache;
         if ($this->mappingCache->isEmpty() || $this->mappingCache->age() > SearchHubConstants::MAPPING_CACHE_TTL) {
-            $uri = SearchHubConstants::getMappingQueriesEndpoint($this->accountName, $this->channelName, $this->stage);
-            try {
-            $mappingsResponse = $this->getHttpClient()->get($uri, ['headers' => ['apikey' => API_KEY::API_KEY]]);
-                assert($mappingsResponse instanceof Response);
-                $indexedMappings = $this->indexMappings(json_decode($mappingsResponse->getBody()->getContents(), true));
-                $this->mappingCache->loadCache($indexedMappings);
-            } catch (Exception $e) {
-                //TODO: log
-            }
+            $update = new MappingDataUpdate();
+            $update->updateMappingData($config, $this->mappingCache, $this->getHttpClient());
         }
-
     }
 
     /**
@@ -146,21 +138,6 @@ class LocalMapper implements SearchHubMapperInterface
         );
         return $mappedQuery;
 
-    }
-
-    protected function indexMappings($mappingsRaw): array
-    {
-        $indexedMappings = array();
-        if (isset($mappingsRaw["clusters"]) && is_array($mappingsRaw["clusters"])) { //v2
-            foreach ($mappingsRaw["clusters"] as $mapping) {
-                foreach ($mapping["queries"] as $variant) {
-                    $indexedMappings[$variant] = array();
-                    $indexedMappings[$variant]["masterQuery"] = $mapping["masterQuery"];
-                    $indexedMappings[$variant]["redirect"] = $mapping["redirect"];
-                }
-            }
-        }
-        return $indexedMappings;
     }
 
     protected function getHttpClient($timeOut = null): ClientInterface
@@ -218,7 +195,7 @@ class LocalMapper implements SearchHubMapperInterface
 
         if ($optimizedSearchString) {
 
-            $promise = $this->getHttpClient((float)0.01)->requestAsync(
+            $promise = $this->getHttpClient((float)0.3)->requestAsync(
                 'post',
                 SearchHubConstants::getMappingDataStatsEndpoint($this->stage),
                 [
@@ -233,7 +210,11 @@ class LocalMapper implements SearchHubMapperInterface
             try {
                 $promise->wait();
             } catch (Exception $e) {
-                //TODO log
+//                $errorMessage = $e->getMessage();
+//                $errorCode = $e->getCode();
+//                $file = $e->getFile();
+//                $line = $e->getLine();
+//                error_log("$originalSearchString Error: $errorMessage (Code: $errorCode) in $file on line $line");
             }
         }
     }

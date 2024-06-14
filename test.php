@@ -14,14 +14,18 @@ $config = array(
     "type" => "local" //or SaaS
 );
 
-//$test = array ("vinil click", "sichtschuztzäune", "klick-vinyl", "aboba", "sichtschutz zaune",
-//    "außen wand leuchte", "waschbecken- unterschrank", "feder nut bretter", "kette säge", "außenleuchten mit bewegungsmelder");
 
-$test = array ("\"vinil click\"", "\"sichtschuztzäune\\", "\\klick-vinyl", "\"aboba\\", "\"aboba\"", "Cola \"Coca\"");
+$test = array ("vinil click", "sichtschuztzäune", "klick-vinyl", "aboba", "sichtschutz zaune",
+    "außen wand leuchte", "waschbecken- unterschrank", "feder nut bretter", "kette säge", "außenleuchten mit bewegungsmelder");
+
+//$test = array ("\"vinil click\"", "\"sichtschuztzäune\\", "\\klick-vinyl", "\"aboba\\", "\"aboba\"", "Cola \"Coca\"", "123", "finylböden", "wandaussenleuchten", "waschbecken mit untershrank");
+$number = 1;
+
+$numberOfQueries = $number * count($test);
 
 $start = microtime(true);
 
-for($i = 1; $i <= 5; $i++){
+for($i = 1; $i <= $number; $i++){
     foreach ($test as $query)
     {
         $client = new SearchHubClient($config);
@@ -31,4 +35,4 @@ for($i = 1; $i <= 5; $i++){
 
 $executionTime = microtime(true) -  $start;
 
-echo "\n\n\t\t35 query:\n" . "Total time: " . $executionTime . "s\nAverage time: " . $executionTime/35 . "s";
+echo "\n\n\t\t$numberOfQueries query:\n" . "Total time: " . $executionTime . "s\nAverage time: " . $executionTime/$numberOfQueries . "s";

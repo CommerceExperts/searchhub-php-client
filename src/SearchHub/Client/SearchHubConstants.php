@@ -33,7 +33,7 @@ class SearchHubConstants
      * @param $ACCOUNT_NAME
      * @return string
      */
-    public static function getMappingQueriesEndpoint($ACCOUNT_NAME, $CHANNEL_NAME, $stage)
+    public static function getMappingQueriesEndpoint($ACCOUNT_NAME, $CHANNEL_NAME, $stage): string
     {
         if ($stage === "qa"){
             return "https://qa-api.searchhub.io/mappingData/v2?tenant={$ACCOUNT_NAME}.{$CHANNEL_NAME}";
@@ -49,7 +49,7 @@ class SearchHubConstants
      * @param $ACCOUNT_NAME
      * @return string
      */
-    public static function getMappingLastModifiedEndpoint($ACCOUNT_NAME, $CHANNEL_NAME, $stage)
+    public static function getMappingLastModifiedEndpoint($ACCOUNT_NAME, $CHANNEL_NAME, $stage): string
     {
         if ($stage === "qa"){
             return "https://qa-api.searchhub.io/modificationTime?tenant={$ACCOUNT_NAME}.{$CHANNEL_NAME}";
