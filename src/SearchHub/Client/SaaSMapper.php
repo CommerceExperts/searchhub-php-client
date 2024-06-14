@@ -129,7 +129,7 @@ class SaaSMapper implements SearchHubMapperInterface
         }
 
 
-        $response = $this->getHttpClient()->get($this->url, ['headers' => ['apikey' => SearchHubConstants::API_KEY]]);
+    $response = $this->getHttpClient()->get($this->url, ['headers' => ['apikey' => API_KEY::API_KEY]]);
         assert($response instanceof Response);
         $mappedQuery = json_decode($response->getBody()->getContents(), true);
 

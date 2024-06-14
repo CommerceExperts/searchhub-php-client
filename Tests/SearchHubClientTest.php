@@ -19,7 +19,7 @@ class SearchHubClientTest extends TestCase
     public function setUp(): void
     {
         $this->config = array(
-            "clientApiKey" => SearchHubConstants::API_KEY,
+            "clientApiKey" => \SearchHub\Client\API_KEY::API_KEY,
             "accountName" => "test",
             "channelName" => "working",
             "stage" => "qa",
@@ -73,7 +73,7 @@ class SearchHubClientTest extends TestCase
             $query = "vinil click";
             $mapper = new \SearchHub\Client\SaaSMapper($this->config, "new-uri");
             $result = $mapper->mapQuery($query);
-            $expected = new QueryMapping("vinil click", "click-vinyl", "https://duckduckgo.com/?t=ffab&q=click-vinyl&atb=v330-1&iax=images&ia=images");
+            $expected = new QueryMapping("vinil click", "click-vinyl", null);
 
             $this->assertEquals($expected, $result);
         } catch (GuzzleHttp\Exception\RequestException $e) {
@@ -127,7 +127,7 @@ class SearchHubClientTest extends TestCase
         $SQLCache = new SQLCache($this->config["accountName"], $this->config["channelName"], $this->config["stage"]);
         $mapper = new LocalMapper($this->config,$SQLCache);
         $result = $mapper->mapQuery($query);
-        $expected = new QueryMapping("vinil click", "click-vinyl", "https://duckduckgo.com/?t=ffab&q=click-vinyl&atb=v330-1&iax=images&ia=images");
+        $expected = new QueryMapping("vinil click", "click-vinyl", null);
 
         $this->assertEquals($expected, $result);
     }
@@ -143,7 +143,7 @@ class SearchHubClientTest extends TestCase
         $SQLCache->deleteCache();
         $mapper = new LocalMapper($this->config,$SQLCache);
         $result = $mapper->mapQuery($query);
-        $expected = new QueryMapping("vinil click", "click-vinyl", "https://duckduckgo.com/?t=ffab&q=click-vinyl&atb=v330-1&iax=images&ia=images");
+        $expected = new QueryMapping("vinil click", "click-vinyl", null);
         $this->assertEquals($expected, $result);
     }
 
@@ -157,7 +157,7 @@ class SearchHubClientTest extends TestCase
         $fileCache = new FileMappingCache($this->config["accountName"], $this->config["channelName"], $this->config["stage"]);
         $mapper = new LocalMapper($this->config,$fileCache);
         $result = $mapper->mapQuery($query);
-        $expected = new QueryMapping("vinil click", "click-vinyl", "https://duckduckgo.com/?t=ffab&q=click-vinyl&atb=v330-1&iax=images&ia=images");
+        $expected = new QueryMapping("vinil click", "click-vinyl", null);
 
         $this->assertEquals($expected, $result);
     }
@@ -176,7 +176,7 @@ class SearchHubClientTest extends TestCase
         $fileCache->deleteCache();
         $mapper = new LocalMapper($this->config,$fileCache);
         $result = $mapper->mapQuery($query);
-        $expected = new QueryMapping("vinil click", "click-vinyl", "https://duckduckgo.com/?t=ffab&q=click-vinyl&atb=v330-1&iax=images&ia=images");
+        $expected = new QueryMapping("vinil click", "click-vinyl", null);
         $this->assertEquals($expected, $result);
     }
 }

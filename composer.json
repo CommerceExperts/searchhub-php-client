@@ -1,38 +1,37 @@
 {
-  "require-dev": {
-    "phpunit/phpunit": "^11.1"
-  },
-
-  "name": "smartQueryPHP",
-  "type": "library",
-  "description": "maps similar searches to best query",
-  "keywords": ["mapping","search optimization"],
-  "homepage": "https://github.com/CommerceExperts/searchhub-php-client",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Rudolf Batt",
-      "email": "rudolf.batt@commerce-experts.com",
-      "role": "Developer"
+    "name": "vendor/package-name",
+    "type": "library",
+    "description": "maps similar searches to best query",
+    "keywords": ["mapping","search optimization"],
+    "homepage": "https://github.com/CommerceExperts/searchhub-php-client",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Rudolf Batt",
+            "email": "rudolf.batt@commerce-experts.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Vitalii Solonychnyi",
+            "email": "solonychnui.vitaliy@lll.kpi.ua",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "ext-json": "*",
+        "ext-pdo": "*",
+        "guzzlehttp/guzzle": "^7.8",
+        "twig/cache-extension": "^1.5"
     },
-    {
-      "name": "Vitalii Solonychnyi",
-      "email": "solonychnui.vitaliy@lll.kpi.ua",
-      "role": "Developer"
-    }
-  ],
-  "require": {
-    "php": " >=8.2",
-    "guzzlehttp/guzzle": "^7.8",
-    "ext-json": "*",
-    "ext-pdo": "*",
-    "ext-http": "*"
-  },
-  "autoload": {
-    "psr-4": {
-      "SearchHub\\Client\\": "src/SearchHub/Client",
-      "App\\": "Tests/"
-    }
-  }
-}
+    "autoload": {
+        "psr-4": {
+            "SearchHub\\Client\\": "src/SearchHub/Client",
+            "App\\": "Tests/"
+        }
+    },
 
+    "require-dev": {
+        "phpunit/phpunit": "^11.1"
+    }
+}

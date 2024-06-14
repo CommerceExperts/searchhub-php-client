@@ -2,12 +2,12 @@
 
 require_once 'vendor/autoload.php';
 
+use SearchHub\Client\API_KEY;
 use SearchHub\Client\SearchHubClient;
-use SearchHub\Client\SearchHubConstants;
 
 
 $config = array(
-    "clientApiKey" => SearchHubConstants::API_KEY,
+    "clientApiKey" => API_KEY::API_KEY,
     "accountName" => "test",
     "channelName" => "working",
     "stage" => "qa",
@@ -25,7 +25,7 @@ for($i = 1; $i <= 5; $i++){
     foreach ($test as $query)
     {
         $client = new SearchHubClient($config);
-        $client->mapQueСщтаry($query);
+        $client->mapQuery($query);
     }
 }
 
