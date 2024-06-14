@@ -6,7 +6,6 @@ use PHPUnit\Framework\TestCase;
 use SearchHub\Client\FileMappingCache;
 use SearchHub\Client\LocalMapper;
 use SearchHub\Client\SearchHubClient;
-use SearchHub\Client\SearchHubConstants;
 use SearchHub\Client\QueryMapping;
 use SearchHub\Client\SQLCache;
 
