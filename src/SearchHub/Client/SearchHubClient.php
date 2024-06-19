@@ -13,7 +13,10 @@ use GuzzleHttp\Exception\GuzzleException;
  */
 class SearchHubClient {
 
-    private LocalMapper|SaaSMapper $mapper;
+    /*
+     * @return LocalMapper|SaaSMapper
+     */
+    private  $mapper;
 
     public function __construct(array $config)
     {

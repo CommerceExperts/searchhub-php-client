@@ -52,17 +52,6 @@ class SearchHubConstants
     }
 
     /**
-     * TODO: modify, if you have more than one SearchHub Channel
-     * @param $CHANNEL_NAME
-     * @param $ACCOUNT_NAME
-     * @return FilesystemCache
-     */
-    public static function getMappingCache($ACCOUNT_NAME, $CHANNEL_NAME, $STAGE): FilesystemCache
-    {
-        return new FilesystemCache("/tmp/cache/data/cache/searchhub/{$ACCOUNT_NAME}/{$CHANNEL_NAME}/{$STAGE}");
-    }
-
-    /**
      * TTL in seconds
      */
     public const MAPPING_CACHE_TTL = 600;

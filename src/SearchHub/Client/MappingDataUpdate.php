@@ -19,20 +19,21 @@ class MappingDataUpdate
         if ($httpClient === null) {
             $httpClient = new Client(['timeout' => SearchHubConstants::REQUEST_TIMEOUT]);
         }
-
-        try {
-            $uri = SearchHubConstants::getMappingQueriesEndpoint($config["accountName"], $config["channelName"], $config["stage"]);
-            $mappingsResponse = $httpClient->get($uri, ['headers' => ['apikey' => API_KEY::API_KEY]]);
-            assert($mappingsResponse instanceof Response);
-            $indexedMappings = $this->indexMappings(json_decode($mappingsResponse->getBody()->getContents(), true));
-            $cache->loadCache($indexedMappings);
-        } catch (Exception $e) {
-            $errorMessage = $e->getMessage();
-            $errorCode = $e->getCode();
-            $file = $e->getFile();
-            $line = $e->getLine();
-            error_log("Error while fetching mapping data: $errorMessage (Code: $errorCode) in $file on line $line");
-        }
+        //if (time() - SearchHubConstants::getMappingLastModifiedEndpoint($config["accountName"], $config["channelName"], $config["stage"]) < SearchHubConstants::MAPPING_CACHE_TTL ){
+            try {
+                $uri = SearchHubConstants::getMappingQueriesEndpoint($config["accountName"], $config["channelName"], $config["stage"]);
+                $mappingsResponse = $httpClient->get($uri, ['headers' => ['apikey' => API_KEY::API_KEY]]);
+                assert($mappingsResponse instanceof Response);
+                $indexedMappings = $this->indexMappings(json_decode($mappingsResponse->getBody()->getContents(), true));
+                $cache->loadCache($indexedMappings);
+            } catch (Exception $e) {
+                $errorMessage = $e->getMessage();
+                $errorCode = $e->getCode();
+                $file = $e->getFile();
+                $line = $e->getLine();
+                error_log("Error while fetching mapping data: $errorMessage (Code: $errorCode) in $file on line $line");
+            }
+        //}
     }
 
     protected function indexMappings($mappingsRaw): array

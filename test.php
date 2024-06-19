@@ -14,6 +14,7 @@ $config = array(
     "type" => "local" //or SaaS
 );
 
+phpinfo();
 
 $test = array ("vinil click", "sichtschuztzäune", "klick-vinyl", "aboba", "sichtschutz zaune",
     "außen wand leuchte", "waschbecken- unterschrank", "feder nut bretter", "kette säge", "außenleuchten mit bewegungsmelder");
@@ -29,7 +30,8 @@ for($i = 1; $i <= $number; $i++){
     foreach ($test as $query)
     {
         $client = new SearchHubClient($config);
-        $client->mapQuery($query);
+        $mappedQuery = $client->mapQuery($query);
+        echo"$query -> $mappedQuery->masterQuery\n";
     }
 }
 

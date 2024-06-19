@@ -10,7 +10,10 @@ use GuzzleHttp\Psr7\Response;
 
 class LocalMapper implements SearchHubMapperInterface
 {
-    protected FileMappingCache|SQLCache|MappingCacheMock $mappingCache;
+    /**
+     * @var FileMappingCache|SQLCache|MappingCacheMock
+     */
+    protected  $mappingCache;
 
     /**
      * @var ClientInterface
@@ -161,9 +164,9 @@ class LocalMapper implements SearchHubMapperInterface
      */
     protected function report(
         string      $originalSearchString,
-        string|null $optimizedSearchString,
+        ?string $optimizedSearchString,
         float       $duration,
-        string|null $redirect,
+        ?string $redirect
     ): void
     {
         $event = sprintf(

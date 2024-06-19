@@ -21,7 +21,7 @@ class FileMappingCache implements MappingCacheInterface
      * Searching locale cache
      */
     public function __construct(string $accountName, string $channelName, string $stage){
-        $this->cache = SearchHubConstants::getMappingCache($accountName, $channelName, $stage);
+        $this->cache = new FilesystemCache("/tmp/cache/data/cache/searchhub/{$accountName}/{$channelName}/{$stage}");
         $this->setKey($this->cache->generateKey($accountName, $channelName));
     }
 

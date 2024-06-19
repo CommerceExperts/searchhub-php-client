@@ -75,8 +75,10 @@ class CacheFactory
         return $this->stage;
     }
 
-
-    public function createCache(): SQLCache|FileMappingCache
+    /**
+     * @return SQLCache|FileMappingCache
+     */
+    public function createCache()
     {
         try
         {

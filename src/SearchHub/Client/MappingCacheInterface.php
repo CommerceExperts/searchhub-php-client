@@ -29,5 +29,6 @@ interface MappingCacheInterface
 
     public function age(): int;
 
+    //public function resetAge(): void;
 
 }

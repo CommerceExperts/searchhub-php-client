@@ -29,7 +29,7 @@ class QueryMapping {
        return $this->masterQuery == null ? $this->userQuery : $this->masterQuery;
     }
 
-    public function __construct(string $userQuery, string|null $masterQuery, string|null $redirect)
+    public function __construct(string $userQuery, ?string $masterQuery, ?string $redirect)
     {
         $this->userQuery = $userQuery;
         $this->masterQuery = $masterQuery;

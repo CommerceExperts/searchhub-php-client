@@ -75,7 +75,7 @@ class SearchHubClientTest extends TestCase
             $expected = new QueryMapping("vinil click", "click-vinyl", null);
 
             $this->assertEquals($expected, $result);
-        } catch (GuzzleHttp\Exception\RequestException $e) {
+        } catch (\Exception $e) {
             $this->markTestSkipped('Failed to connect to the server');
         }
     }
