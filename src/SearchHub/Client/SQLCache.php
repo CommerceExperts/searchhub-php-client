@@ -71,7 +71,7 @@ class SQLCache implements MappingCacheInterface
         //commit transaction
         $this->db->commit();
 
-        touch($this->SQLName);
+        $this->resetAge();
     }
 
     public function deleteCache(): void
@@ -93,5 +93,10 @@ class SQLCache implements MappingCacheInterface
             return time() - filemtime($this->SQLName);
         }
         return 0;
+    }
+
+    public function resetAge(): void
+    {
+        touch($this->SQLName);
     }
 }

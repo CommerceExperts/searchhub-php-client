@@ -16,7 +16,6 @@ class FileMappingCache implements MappingCacheInterface
      */
     protected ?string $key;
 
-
     /**
      * Searching locale cache
      */
@@ -34,16 +33,16 @@ class FileMappingCache implements MappingCacheInterface
     public function get(string $query): QueryMapping
     {
         $query = mb_strtolower($query);
-        $mappings = $this->getCache($this->key);
+        $mappings = $this->getCache();
         $masterQuery = array_key_exists($query, $mappings) ? $mappings[$query]["masterQuery"] : null;
         $redirect = array_key_exists($query, $mappings) ? $mappings[$query]["redirect"] : null;
         return new QueryMapping($query, $masterQuery, $redirect);
     }
 
-    private function getCache(string $cacheFile)
+    private function getCache()
     {
-        if (file_exists($cacheFile) ) {
-            return json_decode(file_get_contents($cacheFile), true);
+        if (file_exists($this->key) ) {
+            return json_decode(file_get_contents($this->key), true);
         }
         return null;
     }
@@ -72,5 +71,10 @@ class FileMappingCache implements MappingCacheInterface
             return time() - $this->cache->getTimestamp($this->key);
         }
         return 0;
+    }
+
+    public function resetAge(): void
+    {
+        touch($this->key);
     }
 }

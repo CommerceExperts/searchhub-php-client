@@ -52,4 +52,9 @@ class MappingCacheMock  implements MappingCacheInterface
     {
         return $this->updated;
     }
+
+    public function resetAge(): void
+    {
+        //
+    }
 }
