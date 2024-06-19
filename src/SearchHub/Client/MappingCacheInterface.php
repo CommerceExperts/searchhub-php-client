@@ -12,7 +12,6 @@ interface MappingCacheInterface
      * variant of the same search
      *
      * @param void
-     *
      * @return void
      */
     public function deleteCache(): void;

@@ -21,8 +21,9 @@ class SearchHubConstants
 
     /**
      * TODO: modify, if you have more than one SearchHub Channel
-     * @param $CHANNEL_NAME
      * @param $ACCOUNT_NAME
+     * @param $CHANNEL_NAME
+     * @param $stage
      * @return string
      */
     public static function getMappingQueriesEndpoint($ACCOUNT_NAME, $CHANNEL_NAME, $stage): string
@@ -56,7 +57,7 @@ class SearchHubConstants
      * @param $ACCOUNT_NAME
      * @return FilesystemCache
      */
-    public static function getMappingCache($ACCOUNT_NAME, $CHANNEL_NAME, $STAGE)
+    public static function getMappingCache($ACCOUNT_NAME, $CHANNEL_NAME, $STAGE): FilesystemCache
     {
         return new FilesystemCache("/tmp/cache/data/cache/searchhub/{$ACCOUNT_NAME}/{$CHANNEL_NAME}/{$STAGE}");
     }

@@ -12,6 +12,7 @@ class SQLCache implements MappingCacheInterface
      * @var PDO|null
      */
     protected ?PDO $db;
+
     protected string $SQLName;
 
 
