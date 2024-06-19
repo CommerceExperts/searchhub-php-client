@@ -9,19 +9,19 @@ class FileMappingCache implements MappingCacheInterface
     /**
      * @var FilesystemCache|null
      */
-    protected ?FilesystemCache $cache;
+    private ?FilesystemCache $cache;
 
     /**
      * @var string|null
      */
-    protected ?string $key;
+    private ?string $key;
 
     /**
      * Searching locale cache
      */
-    public function __construct(string $accountName, string $channelName, string $stage){
-        $this->cache = new FilesystemCache("/tmp/cache/data/cache/searchhub/{$accountName}/{$channelName}/{$stage}");
-        $this->setKey($this->cache->generateKey($accountName, $channelName));
+    public function __construct(Config $config){
+        $this->cache = new FilesystemCache("/tmp/cache/data/cache/searchhub/{$config->getAccountName()}/{$config->getChannelName()}/{$config->getStage()}");
+        $this->setKey($this->cache->generateKey($config->getAccountName(), $config->getChannelName()));
     }
 
     private function setKey($key): void
@@ -60,14 +60,12 @@ class FileMappingCache implements MappingCacheInterface
         $this->resetAge();
     }
 
-
-
     public function isEmpty(): bool
     {
         return $this->cache->getTimestamp($this->key) === 0;
     }
 
-    public function age(): int {
+    public function lastModifiedDate(): int {
         return $this->cache->getTimestamp($this->key);
     }
 

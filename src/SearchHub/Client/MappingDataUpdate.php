@@ -11,26 +11,24 @@ class MappingDataUpdate
     private Config $config;
     private Client $httpClient;
 
-    private int $dateOfLastUpdate;
-
-    function updateMappingData($config, $cache = null, $httpClient = null): void
+    function updateMappingData($config, $cache, $httpClient): void
     { //should have been called every 10-minute
-        $this->config = $config;
-        if ($cache === null) {
-            $cacheFactory = new CacheFactory($config);
-            $cache = $cacheFactory->createCache();
-        }
+          $this->config = $config;
+//        if ($cache === null) {
+//            $cacheFactory = new CacheFactory($config);
+//            $cache = $cacheFactory->createCache();
+//        }
+//
+//        if ($httpClient === null) {
+//            $this->httpClient = new Client(['timeout' => SearchHubConstants::REQUEST_TIMEOUT]);
+//        } else {
+//            $this->httpClient = $httpClient;
+//        }
 
-        if ($httpClient === null) {
-            $this->httpClient = new Client(['timeout' => SearchHubConstants::REQUEST_TIMEOUT]);
-        } else {
-            $this->httpClient = $httpClient;
-        }
 
-        if ($this->getSaaSLastModifiedDate() < SearchHubConstants::MAPPING_CACHE_TTL ){
         try {
-            $uri = SearchHubConstants::getMappingQueriesEndpoint($config["accountName"], $config["channelName"], $config["stage"]);
-            $mappingsResponse = $this->httpClient->get($uri, ['headers' => ['apikey' => API_KEY::API_KEY]]);
+            $uri = SearchHubConstants::getMappingQueriesEndpoint($this->config->getAccountName(), $this->config->getChannelName(), $this->config->getStage());
+            $mappingsResponse = $httpClient->get($uri, ['headers' => ['apikey' => $this->config->getClientApiKey()]]);
             assert($mappingsResponse instanceof Response);
             $indexedMappings = $this->indexMappings(json_decode($mappingsResponse->getBody()->getContents(), true));
             $cache->loadCache($indexedMappings);
@@ -40,7 +38,6 @@ class MappingDataUpdate
             $file = $e->getFile();
             $line = $e->getLine();
             error_log("Error while fetching mapping data: $errorMessage (Code: $errorCode) in $file on line $line");
-        }
         }
     }
 
@@ -58,5 +55,4 @@ class MappingDataUpdate
         }
         return $indexedMappings;
     }
-
 }

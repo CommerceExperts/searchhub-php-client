@@ -3,6 +3,8 @@
 use App\MappingCacheMock;
 use PHPUnit\Framework\TestCase;
 
+use SearchHub\Client\API_KEY;
+use SearchHub\Client\Config;
 use SearchHub\Client\FileMappingCache;
 use SearchHub\Client\LocalMapper;
 use SearchHub\Client\SearchHubClient;
@@ -13,23 +15,20 @@ use SearchHub\Client\SQLCache;
 class SearchHubClientTest extends TestCase
 {
 
-    protected array $config;
+    protected \SearchHub\Client\Config $config;
 
     public function setUp(): void
     {
-        $this->config = array(
-            "clientApiKey" => \SearchHub\Client\API_KEY::API_KEY,
-            "accountName" => "test",
-            "channelName" => "working",
-            "stage" => "qa",
-        );
+
+        $this->config = new Config(API_KEY::API_KEY, "test", "working", "qa", "SaaS");
+
     }
 
     public function testByPassQuery1()
     {
         //SaaS "vinil click" -> "vinil click"
 
-        $this->config["type"] = "SaaS";
+        $this->config->setType("SaaS");
 
         $query = "\"vinil click\"";
         $client = new SearchHubClient($this->config);
@@ -41,7 +40,7 @@ class SearchHubClientTest extends TestCase
     public function testByPassQuery2()
     {
         // klick-vinyl -> \klick-vinyl
-        $this->config["type"] = "SaaS";
+        $this->config->setType("SaaS");
 
         $query = "\\klick-vinyl";
         $client = new SearchHubClient($this->config);
@@ -53,7 +52,7 @@ class SearchHubClientTest extends TestCase
     public function testSaaSMapper()
     {
         // vinil click -> click-vinyl (SaaS mapper)
-        $this->config["type"] = "SaaS";
+        $this->config->setType("SaaS");
 
         $query = "vinil click";
         $client = new SearchHubClient($this->config);
@@ -67,8 +66,7 @@ class SearchHubClientTest extends TestCase
     {
         // vinil click -> click-vinyl (SaaS mapper)
         try {
-            $this->config["type"] = "SaaS";
-
+            $this->config->setType("SaaS");
             $query = "vinil click";
             $mapper = new \SearchHub\Client\SaaSMapper($this->config, "new-uri");
             $result = $mapper->mapQuery($query);
@@ -82,7 +80,7 @@ class SearchHubClientTest extends TestCase
 
     public function testCacheEmptyAndYoung()
     {
-        $this->config["type"] = "local";
+        $this->config->setType("local");
 
         $cacheMock = new MappingCacheMock(true, false);
         new LocalMapper($this->config,$cacheMock);
@@ -91,7 +89,7 @@ class SearchHubClientTest extends TestCase
 
     public function testCacheExistingAndYoung()
     {
-        $this->config["type"] = "local";
+        $this->config->setType("local");
 
         $cacheMock = new MappingCacheMock(false, false);
         new LocalMapper($this->config,$cacheMock);
@@ -100,7 +98,7 @@ class SearchHubClientTest extends TestCase
 
     public function testCacheExistingAndOld()
     {
-        $this->config["type"] = "local";
+        $this->config->setType("local");
 
         $cacheMock = new MappingCacheMock(true, true);
         new LocalMapper($this->config,$cacheMock);
@@ -109,7 +107,7 @@ class SearchHubClientTest extends TestCase
 
     public function testCacheEmptyAndOld()
     {
-        $this->config["type"] = "local";
+        $this->config->setType("local");
 
         $cacheMock = new MappingCacheMock(false, true);
         new LocalMapper($this->config,$cacheMock);
@@ -120,11 +118,11 @@ class SearchHubClientTest extends TestCase
     {
         // vinil click -> click-vinyl
 
-        $this->config["type"] = "local";
+        $this->config->setType("local");
         $query = "vinil click";
 
-        $SQLCache = new SQLCache($this->config["accountName"], $this->config["channelName"], $this->config["stage"]);
-        $mapper = new LocalMapper($this->config,$SQLCache);
+        $SQLCache = new SQLCache($this->config);
+        $mapper = new LocalMapper($this->config, $SQLCache);
         $result = $mapper->mapQuery($query);
         $expected = new QueryMapping("vinil click", "click-vinyl", null);
 
@@ -135,14 +133,15 @@ class SearchHubClientTest extends TestCase
     {
         // vinil click -> click-vinyl
 
-        $this->config["type"] = "local";
+        $this->config->setType("local");
         $query = "vinil click";
 
-        $SQLCache = new SQLCache($this->config["accountName"], $this->config["channelName"], $this->config["stage"]);
+        $SQLCache = new SQLCache($this->config);
         $SQLCache->deleteCache();
-        $mapper = new LocalMapper($this->config,$SQLCache);
+        $mapper = new LocalMapper($this->config, $SQLCache);
         $result = $mapper->mapQuery($query);
         $expected = new QueryMapping("vinil click", "click-vinyl", null);
+
         $this->assertEquals($expected, $result);
     }
 
@@ -150,10 +149,10 @@ class SearchHubClientTest extends TestCase
     {
         // vinil click -> click-vinyl
 
-        $this->config["type"] = "local";
+        $this->config->setType("local");
         $query = "vinil click";
 
-        $fileCache = new FileMappingCache($this->config["accountName"], $this->config["channelName"], $this->config["stage"]);
+        $fileCache = new FileMappingCache($this->config);
         $mapper = new LocalMapper($this->config,$fileCache);
         $result = $mapper->mapQuery($query);
         $expected = new QueryMapping("vinil click", "click-vinyl", null);
@@ -168,10 +167,10 @@ class SearchHubClientTest extends TestCase
     {
         // vinil click -> click-vinyl
 
-        $this->config["type"] = "local";
+        $this->config->setType("local");
         $query = "vinil click";
 
-        $fileCache = new FileMappingCache($this->config["accountName"], $this->config["channelName"], $this->config["stage"]);
+        $fileCache = new FileMappingCache($this->config);
         $fileCache->deleteCache();
         $mapper = new LocalMapper($this->config,$fileCache);
         $result = $mapper->mapQuery($query);

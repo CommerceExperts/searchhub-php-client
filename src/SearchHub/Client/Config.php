@@ -26,10 +26,14 @@ class Config
      */
     protected $stage;
 
-    public function setClientApiKey($clientApiKey): LocalMapper
+    /**
+     * @var string
+     */
+    protected $type;
+
+    public function setClientApiKey($clientApiKey)
     {
         $this->clientApiKey = $clientApiKey;
-        return $this;
     }
 
     /**
@@ -40,17 +44,63 @@ class Config
         return $this->clientApiKey;
     }
 
-    public function setAccountName($accountName): LocalMapper
+    public function setAccountName($accountName)
     {
         $this->accountName = $accountName;
-        return $this;
     }
-    public function __construct($apiKey, $accountName, $channelName, $stage, $type){
-        $config = array(
-            "clientApiKey" => API_KEY::API_KEY,
-            "accountName" => "test",
-            "channelName" => "working",
-            "stage" => "qa",
-            "type" => "local");//or SaaS);
+
+    /**
+     * @return string|null
+     */
+    public function getAccountName(): ?string
+    {
+        return $this->accountName;
+    }
+
+    public function setChannelName($channelName)
+    {
+        $this->channelName = $channelName;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getChannelName(): ?string
+    {
+        return $this->channelName;
+    }
+
+    public function setStage($stage = null)
+    {
+        $this->stage = ($stage === "qa") ? "qa" : "prod";
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getStage(): ?string
+    {
+        return $this->stage;
+    }
+
+    public function setType($type)
+    {
+        $this->type = ($type !== "local") ? "SaaS" :  "local";
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function __construct($clientApiKey, $accountName, $channelName, $stage, $type){
+        $this->setClientApiKey($clientApiKey);
+        $this->setAccountName($accountName);
+        $this->setChannelName($channelName);
+        $this->setStage($stage);
+        $this->setType($type);
     }
 }

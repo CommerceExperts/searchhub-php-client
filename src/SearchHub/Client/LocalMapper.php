@@ -13,105 +13,21 @@ class LocalMapper implements SearchHubMapperInterface
     /**
      * @var FileMappingCache|SQLCache|MappingCacheMock
      */
-    protected  $mappingCache;
+    private  $mappingCache;
 
     /**
      * @var ClientInterface
      */
-    protected $httpClient;
+    private $httpClient;
 
     /**
-     * @var string|null
+     * @var Config
      */
-    protected $clientApiKey;
+    private $config;
 
-    /**
-     * @var string|null
-     */
-    protected $accountName;
-
-    /**
-     * @var string|null
-     */
-    protected $channelName;
-
-    /**
-     * @var string
-     */
-    protected $stage;
-
-    public function setClientApiKey($clientApiKey): LocalMapper
+    public function __construct(Config $config, MappingCacheInterface $cache=null)
     {
-        $this->clientApiKey = $clientApiKey;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getClientApiKey(): ?string
-    {
-        return $this->clientApiKey;
-    }
-
-    public function setAccountName($accountName): LocalMapper
-    {
-        $this->accountName = $accountName;
-        return $this;
-    }
-
-
-    /**
-     * @return string|null
-     */
-    public function getAccountName(): ?string
-    {
-        return $this->accountName;
-    }
-
-
-    public function setChannelName($channelName): LocalMapper
-    {
-        $this->channelName = $channelName;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getChannelName(): ?string
-    {
-        return $this->channelName;
-    }
-
-    public function setStage($stage = null): LocalMapper
-    {
-        $this->stage = ($stage === "qa") ? "qa" : "prod";
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getStage(): ?string
-    {
-        return $this->stage;
-    }
-
-    public function __construct(array $config, MappingCacheInterface $cache=null)
-    {
-        if (isset($config['clientApiKey'])) {
-            $this->setClientApiKey($config['clientApiKey']);
-        }
-        if (isset($config['accountName'])) {
-            $this->setAccountName($config['accountName']);
-        }
-        if (isset($config['channelName'])) {
-            $this->setChannelName($config['channelName']);
-        }
-        if (isset($config['stage'])) {
-            $this->setStage($config['stage']);
-        }
+        $this->config = $config;
 
         if ($cache === null){
             $cacheFactory = new CacheFactory($config);
@@ -119,7 +35,7 @@ class LocalMapper implements SearchHubMapperInterface
         }
 
         $this->mappingCache = $cache;
-        if ($this->mappingCache->isEmpty() || $this->getSaaSLastModifiedDate() > $this->mappingCache->age()) {
+        if ($this->mappingCache->isEmpty() || ($this->getSaaSLastModifiedDate() > $this->mappingCache->lastModifiedDate())) {
             $update = new MappingDataUpdate();
             $update->updateMappingData($config, $this->mappingCache, $this->getHttpClient());
         }
@@ -127,16 +43,16 @@ class LocalMapper implements SearchHubMapperInterface
 
     public function getSaaSLastModifiedDate(): int
     {
-
         if ($this->config->getStage() === "qa")
         {
             $uri = "https://qa-api.searchhub.io/modificationTime?tenant={$this->config->getAccountName()}.{$this->config->getChannelName()}";
-        } else
+        }
+        else
         {
             $uri = "https://api.searchhub.io/modificationTime?tenant={$this->config->getAccountName()}.{$this->config->getChannelName()}";
         }
 
-        $response = $this->httpClient->get($uri, ['headers' => ['apikey' => API_KEY::API_KEY]]);
+        $response = $this->getHttpClient()->get($uri, ['headers' => ['apikey' => API_KEY::API_KEY]]);
         assert($response instanceof Response);
 
         return (int)json_decode($response->getBody()->getContents(), true);
@@ -149,7 +65,6 @@ class LocalMapper implements SearchHubMapperInterface
     {
         $startTimestamp = microtime(true);
         $mappedQuery = $this->mappingCache->get($userQuery);;
-
         $this->report(
             $userQuery,
             $mappedQuery->masterQuery,
@@ -157,12 +72,10 @@ class LocalMapper implements SearchHubMapperInterface
             $mappedQuery->redirect,
         );
         return $mappedQuery;
-
     }
 
     protected function getHttpClient($timeOut = null): ClientInterface
     {
-
         if ($this->httpClient === null) {
             $this->httpClient = new Client([
                 'timeout' => (float)$timeOut ? $timeOut : SearchHubConstants::REQUEST_TIMEOUT,]);
@@ -208,25 +121,20 @@ class LocalMapper implements SearchHubMapperInterface
             $redirect == null ? "null" : "\"$redirect\"",
             $duration * 1000 * 1000 * 1000,
             time() * 1000,
-            $this->accountName,
-            $this->channelName,
+            $this->config->getAccountName(),
+            $this->config->getChannelName(),
         );
 
-
         if ($optimizedSearchString) {
-
-            $promise = $this->getHttpClient((float)0.3)->requestAsync(
-                'post',
-                SearchHubConstants::getMappingDataStatsEndpoint($this->stage),
+            $promise = $this->getHttpClient((float)0.3)->requestAsync('post', SearchHubConstants::getMappingDataStatsEndpoint($this->config->getStage()),
                 [
                     'headers' => [
-                        'apikey' => $this->clientApiKey,
+                        'apikey' => $this->config->getClientApiKey(),
                         'Content-Type' => 'application/json',
                     ],
                     'body' => $event,
                 ]
             );
-
             try {
                 $promise->wait();
             } catch (Exception $e) {

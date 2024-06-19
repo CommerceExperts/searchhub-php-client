@@ -41,7 +41,11 @@ class MappingCacheMock  implements MappingCacheInterface
 
     public function age(): int
     {
-        return PHP_INT_MAX;
+        if ($this->isOld){
+            return 9223372036854775807;
+        } else {
+            return 0;
+        }
     }
 
     public function isUpdated(): bool
@@ -52,5 +56,15 @@ class MappingCacheMock  implements MappingCacheInterface
     public function resetAge(): void
     {
         //
+    }
+
+    public function lastModifiedDate(): int
+    {
+        if ($this->isOld){
+            return 0;
+
+        } else {
+            return 9223372036854775807;
+        }
     }
 }

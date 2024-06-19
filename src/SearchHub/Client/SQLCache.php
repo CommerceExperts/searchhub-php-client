@@ -2,23 +2,21 @@
 
 namespace SearchHub\Client;
 
-use Exception;
 use PDO;
-use PDOException;
 
 class SQLCache implements MappingCacheInterface
 {
     /**
      * @var PDO|null
      */
-    protected ?PDO $db;
+    private ?PDO $db;
 
-    protected string $SQLName;
+    private string $SQLName;
 
 
-    public function __construct($accountName, $channelName, $stage)
+    public function __construct(Config $config)
     {
-        $this->SQLName = "database.$accountName.$channelName.$stage.sqlite";
+        $this->SQLName = "database.{$config->getAccountName()}.{$config->getChannelName()}.{$config->getStage()}.sqlite";
         $this->db = new PDO('sqlite:'. $this->SQLName);
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -26,12 +24,11 @@ class SQLCache implements MappingCacheInterface
         //If table don´t exist - create
         if ($result->fetch() === false) {
             $createTableQuery = "
-        CREATE TABLE queries (
+            CREATE TABLE queries (
             userQuery VARCHAR(255) PRIMARY KEY,
             masterQuery VARCHAR(255),
             redirect VARCHAR(255)
-        )
-        ";
+        )";
             $this->db->exec($createTableQuery);
         }
     }
@@ -66,7 +63,6 @@ class SQLCache implements MappingCacheInterface
                 $stmt->bindParam(':masterQuery', $masterQuery);
                 $stmt->bindParam(':redirect', $redirect);
                 $stmt->execute();
-
         }
         //commit transaction
         $this->db->commit();
@@ -76,8 +72,7 @@ class SQLCache implements MappingCacheInterface
 
     public function deleteCache(): void
     {
-            $this->db->exec("DELETE FROM queries");
-
+        $this->db->exec("DELETE FROM queries");
     }
 
     public function isEmpty(): bool
@@ -89,7 +84,7 @@ class SQLCache implements MappingCacheInterface
 
     public function lastModifiedDate(): int
     {
-        return ($this->SQLName);
+        return filemtime($this->SQLName);
     }
 
     public function resetAge(): void

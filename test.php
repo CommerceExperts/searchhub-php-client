@@ -3,21 +3,16 @@
 require_once 'vendor/autoload.php';
 
 use SearchHub\Client\API_KEY;
+use SearchHub\Client\Config;
 use SearchHub\Client\SearchHubClient;
 
 
-$config = array(
-    "clientApiKey" => API_KEY::API_KEY,
-    "accountName" => "test",
-    "channelName" => "working",
-    "stage" => "qa",
-    "type" => "local" //or SaaS
-);
+$config = new Config(API_KEY::API_KEY, "test", "working", "qa", "SaaS");
 
-$test = array ("vinil click", "sichtschuztzäune", "klick-vinyl", "aboba", "sichtschutz zaune",
-    "außen wand leuchte", "waschbecken- unterschrank", "feder nut bretter", "kette säge", "außenleuchten mit bewegungsmelder");
+//$test = array ("vinil click", "sichtschuztzäune", "klick-vinyl", "aboba", "sichtschutz zaune",
+//    "außen wand leuchte", "waschbecken- unterschrank", "feder nut bretter", "kette säge", "außenleuchten mit bewegungsmelder");
 
-//$test = array ("\"vinil click\"", "\"sichtschuztzäune\\", "\\klick-vinyl", "\"aboba\\", "\"aboba\"", "Cola \"Coca\"", "123", "finylböden", "wandaussenleuchten", "waschbecken mit untershrank");
+$test = array ("\"vinil click\"", "\"sichtschuztzäune\\", "\\klick-vinyl", "\"aboba\\", "\"aboba\"", "Cola \"Coca\"", "123", "finylböden", "wandaussenleuchten", "waschbecken mit untershrank");
 $number = 1;
 
 $numberOfQueries = $number * count($test);

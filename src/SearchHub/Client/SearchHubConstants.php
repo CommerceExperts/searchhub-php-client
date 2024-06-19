@@ -2,17 +2,15 @@
 
 namespace SearchHub\Client;
 
-use Twig\Cache\FilesystemCache;
-
-
 class SearchHubConstants
 {
 
+//TODO Maybe delete
+//    /**
+//     * The base url to prepend to relative redirect urls
+//     */
+//    public const REDIRECTS_BASE_URL = 'https://www.myshopdomain.de/redirectsBaseUrl';
 
-    /**
-     * The base url to prepend to relative redirect urls
-     */
-    public const REDIRECTS_BASE_URL = 'https://www.myshopdomain.de/redirectsBaseUrl';
 
     /**
      * @var string
@@ -33,26 +31,18 @@ class SearchHubConstants
         } else {
             return "https://api.searchhub.io/mappingData/v2?tenant={$ACCOUNT_NAME}.{$CHANNEL_NAME}";
         }
-
     }
 
-    /**
-     * TODO: modify, if you have more than one SearchHub Channel
-     * @param $CHANNEL_NAME
-     * @param $ACCOUNT_NAME
-     * @return string
-     */
-
-
+    //TODO Maybe delete
     /**
      * TTL in seconds
      */
     public const MAPPING_CACHE_TTL = 600;
 
+
     /**
      * Endpoint to asynchronously send mapping statistics
      */
-
 
     public static function getMappingDataStatsEndpoint(string $stage): string
     {

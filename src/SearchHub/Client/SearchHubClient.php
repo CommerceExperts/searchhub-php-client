@@ -18,9 +18,9 @@ class SearchHubClient {
      */
     private  $mapper;
 
-    public function __construct(array $config)
+    public function __construct(Config $config)
     {
-        if ($config['type'] === "SaaS") {
+        if ($config->getType() === "SaaS") {
             $this->mapper = new SaaSMapper($config);
         }
         else
