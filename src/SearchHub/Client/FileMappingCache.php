@@ -57,6 +57,7 @@ class FileMappingCache implements MappingCacheInterface
     public function loadCache(array $loadedCache): void
     {
         $this->cache->write($this->key, json_encode($loadedCache));
+        $this->resetAge();
     }
 
 
@@ -67,10 +68,7 @@ class FileMappingCache implements MappingCacheInterface
     }
 
     public function age(): int {
-        if (file_exists($this->key)) {
-            return time() - $this->cache->getTimestamp($this->key);
-        }
-        return 0;
+        return $this->cache->getTimestamp($this->key);
     }
 
     public function resetAge(): void

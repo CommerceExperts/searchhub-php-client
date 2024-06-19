@@ -42,14 +42,7 @@ class SearchHubConstants
      * @param $ACCOUNT_NAME
      * @return string
      */
-    public static function getMappingLastModifiedEndpoint($ACCOUNT_NAME, $CHANNEL_NAME, $stage): string
-    {
-        if ($stage === "qa"){
-            return "https://qa-api.searchhub.io/modificationTime?tenant={$ACCOUNT_NAME}.{$CHANNEL_NAME}";
-        } else {
-            return "https://api.searchhub.io/modificationTime?tenant={$ACCOUNT_NAME}.{$CHANNEL_NAME}";
-        }
-    }
+
 
     /**
      * TTL in seconds

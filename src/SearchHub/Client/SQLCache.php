@@ -87,12 +87,9 @@ class SQLCache implements MappingCacheInterface
         return $row['count'] == 0;
     }
 
-    public function age(): int
+    public function lastModifiedDate(): int
     {
-        if (file($this->SQLName)){
-            return time() - filemtime($this->SQLName);
-        }
-        return 0;
+        return ($this->SQLName);
     }
 
     public function resetAge(): void

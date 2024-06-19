@@ -14,8 +14,6 @@ $config = array(
     "type" => "local" //or SaaS
 );
 
-phpinfo();
-
 $test = array ("vinil click", "sichtschuztzäune", "klick-vinyl", "aboba", "sichtschutz zaune",
     "außen wand leuchte", "waschbecken- unterschrank", "feder nut bretter", "kette säge", "außenleuchten mit bewegungsmelder");
 

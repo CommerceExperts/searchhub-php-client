@@ -119,10 +119,27 @@ class LocalMapper implements SearchHubMapperInterface
         }
 
         $this->mappingCache = $cache;
-        if ($this->mappingCache->isEmpty() || $this->mappingCache->age() > SearchHubConstants::MAPPING_CACHE_TTL) {
+        if ($this->mappingCache->isEmpty() || $this->getSaaSLastModifiedDate() > $this->mappingCache->age()) {
             $update = new MappingDataUpdate();
             $update->updateMappingData($config, $this->mappingCache, $this->getHttpClient());
         }
+    }
+
+    public function getSaaSLastModifiedDate(): int
+    {
+
+        if ($this->config->getStage() === "qa")
+        {
+            $uri = "https://qa-api.searchhub.io/modificationTime?tenant={$this->config->getAccountName()}.{$this->config->getChannelName()}";
+        } else
+        {
+            $uri = "https://api.searchhub.io/modificationTime?tenant={$this->config->getAccountName()}.{$this->config->getChannelName()}";
+        }
+
+        $response = $this->httpClient->get($uri, ['headers' => ['apikey' => API_KEY::API_KEY]]);
+        assert($response instanceof Response);
+
+        return (int)json_decode($response->getBody()->getContents(), true);
     }
 
     /**

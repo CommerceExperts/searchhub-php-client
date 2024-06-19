@@ -41,11 +41,7 @@ class MappingCacheMock  implements MappingCacheInterface
 
     public function age(): int
     {
-        if ($this->isOld){
-            return SearchHubConstants::MAPPING_CACHE_TTL + 1;
-        } else {
-            return 0;
-        }
+        return PHP_INT_MAX;
     }
 
     public function isUpdated(): bool
