@@ -74,7 +74,7 @@ class SearchHubClientTest extends TestCase
 
             $this->assertEquals($expected, $result);
         } catch (\Exception $e) {
-            $this->markTestSkipped('Failed to connect to the server');
+            $this->markTestSkipped('Failed to connect to the server with custom uri');
         }
     }
 
