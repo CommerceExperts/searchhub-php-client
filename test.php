@@ -7,7 +7,8 @@ use SearchHub\Client\Config;
 use SearchHub\Client\SearchHubClient;
 
 
-$config = new Config(API_KEY::API_KEY, "test", "working", "qa", "local");
+$config = new Config( "test", "working", "qa", "saas", null, API_KEY::API_KEY);
+
 
 //$test = array ("vinil click", "sichtschuztzäune", "klick-vinyl", "aboba", "sichtschutz zaune",
 //    "außen wand leuchte", "waschbecken- unterschrank", "feder nut bretter", "kette säge", "außenleuchten mit bewegungsmelder");
@@ -17,17 +18,38 @@ $number = 1;
 
 $numberOfQueries = $number * count($test);
 
+echo"\tSaaS mapper:";
 $start = microtime(true);
+$client = new SearchHubClient($config);
 
 for($i = 1; $i <= $number; $i++){
     foreach ($test as $query)
     {
-        $client = new SearchHubClient($config);
         $mappedQuery = $client->mapQuery($query);
-        echo"$query -> $mappedQuery->masterQuery\n";
+        //echo"$query -> $mappedQuery->masterQuery\n";
+        //echo json_encode($query);
     }
 }
 
 $executionTime = microtime(true) -  $start;
 
-echo "\n\n\t\t$numberOfQueries query:\n" . "Total time: " . $executionTime . "s\nAverage time: " . $executionTime/$numberOfQueries . "s";
+echo "\t\t$numberOfQueries query:\n" . "Total time: " . $executionTime . "s\nAverage time: " . $executionTime/$numberOfQueries . "s";
+
+
+echo"\n\n\n\n\tLocal mapper:";
+$config = new Config( "test", "working", "qa", "local", null, API_KEY::API_KEY);
+$start = microtime(true);
+
+$client = new SearchHubClient($config);
+
+for($i = 1; $i <= $number; $i++){
+    foreach ($test as $query)
+    {
+        $mappedQuery = $client->mapQuery($query);
+        //echo"$query -> $mappedQuery->masterQuery\n";
+    }
+}
+
+$executionTime = microtime(true) -  $start;
+
+echo "\t\t$numberOfQueries query:\n" . "Total time: " . $executionTime . "s\nAverage time: " . $executionTime/$numberOfQueries . "s";

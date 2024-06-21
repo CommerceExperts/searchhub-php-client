@@ -15,6 +15,7 @@ interface MappingCacheInterface
      */
     public function deleteCache(): void;
 
+
     /**
      * Rewrite cache
      *

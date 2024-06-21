@@ -66,7 +66,7 @@ class LocalMapper implements SearchHubMapperInterface
         $response = $this->getHttpClient()->get($uri, ['headers' => ['apikey' => API_KEY::API_KEY]]);
         assert($response instanceof Response);
 
-        return (int)json_decode($response->getBody()->getContents(), true);
+        return (int)json_decode($response->getBody()->getContents(), true) / 1000;
     }
 
     /**
@@ -113,8 +113,8 @@ class LocalMapper implements SearchHubMapperInterface
         $event = sprintf(
             '[
                     {
-                        "from": "%s",
-                        "to": "%s",
+                        "from": %s,
+                        "to": %s,
                         "redirect": %s,
                         "durationNs": %d,
                         "timestampMillis" : %d,
@@ -127,9 +127,9 @@ class LocalMapper implements SearchHubMapperInterface
                         "libVersion": "php-client 1.0"
                     }
                 ]',
-            $originalSearchString,
-            $optimizedSearchString == null ? $originalSearchString : $optimizedSearchString,
-            $redirect == null ? "null" : "\"$redirect\"",
+            json_encode($originalSearchString),
+            json_encode($optimizedSearchString == null ? $originalSearchString : $optimizedSearchString),
+            $redirect == null ? "null" : json_encode("$redirect"),
             $duration * 1000 * 1000 * 1000,
             time() * 1000,
             $this->config->getAccountName(),
@@ -138,7 +138,7 @@ class LocalMapper implements SearchHubMapperInterface
 
         if ($optimizedSearchString) {
             $url = $this->config->getMappingDataStatsEndpoint();
-            $promise = $this->getHttpClient(0.3)->requestAsync('post', $url,
+            $promise = $this->getHttpClient(0.5)->requestAsync('post', $url,
             [
                     'headers' => [
                         'apikey' => $this->config->getClientApiKey(),
@@ -154,7 +154,7 @@ class LocalMapper implements SearchHubMapperInterface
 //                $errorCode = $e->getCode();
 //                $file = $e->getFile();
 //                $line = $e->getLine();
-//                error_log("$originalSearchString Error: $errorMessage (Code: $errorCode) in $file on line $line");
+//                //error_log("$originalSearchString Error: $errorMessage (Code: $errorCode) in $file on line $line");
             }
         }
     }

@@ -145,7 +145,7 @@ class Config
         if ($this->SaaSEndPoint === null){
             return "https://{$this->stage}-saas.searchhub.io/smartquery/v2/{$this->accountName}/{$this->channelName}?userQuery={$userQuery}";
         } else {
-            return $this->SaaSEndPoint . $userQuery;
+            return $this->SaaSEndPoint ."?userQuery=". $userQuery;
         }
     }
 
@@ -182,8 +182,23 @@ class Config
         return "/tmp/cache/data/cache/searchhub/{$this->accountName}/{$this->channelName}/{$this->stage}";
     }
 
-
-    public function __construct($accountName, $channelName, $stage, $type, $customSaaSEndPoint=null, $clientApiKey=null){
+    /**
+     * Constructor for initializing an instance of a class.
+     *
+     * Initializes the object with provided parameters, setting up the account name,
+     * channel name, stage/environment, type of mapper, optional custom SaaS endpoint,
+     * and client API key if applicable.
+     *
+     * @param string $accountName The name of the account
+     * @param string $channelName The name of the channel
+     * @param string $stage The stage/environment  ("qa" or "prod").
+     * @param string $type The type of mapper being instantiated ("local" or "saas").
+     * @param string|null $customSaaSEndPoint Optional. Custom SaaS endpoint URL for SaaS mapping.
+     *                                      Format example: "customURL=$query".
+     * @param string|null $clientApiKey Optional. API key required for local mapping for client authentication.
+     */
+    public function __construct(string $accountName, string $channelName, string $stage, string $type, ?string $customSaaSEndPoint = null, ?string $clientApiKey = null)
+    {
         $this->setClientApiKey($clientApiKey);
         $this->setAccountName($accountName);
         $this->setChannelName($channelName);

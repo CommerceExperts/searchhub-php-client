@@ -64,14 +64,35 @@ class SearchHubClientTest extends TestCase
 
     public function testSaaSMapperCustomURI()
     {
-        // vinil click -> click-vinyl (SaaS mapper)
 
-        $configSaaSCustomURL = new Config(API_KEY::API_KEY, "test", "working", "qa", "SaaS", "customURL");
+
+        $configSaaSCustomURL = new Config("test", "working", "qa", "saas",
+        "https://saas.searchhub.io/smartquery/v2/decathlon/de");
         try {
-            $query = "vinil click";
+            $query = "farrad";
             $client = new SearchHubClient($configSaaSCustomURL);
             $result = $client->mapQuery($query);
-            $expected = new QueryMapping("vinil click", "click-vinyl", null);
+            $expected = new QueryMapping("farrad", "fahrrad", "https://www.decathlon.de/Fahrrad-Welt_lp-QSM56N");
+
+            $this->assertEquals($expected, $result);
+        } catch (\Exception $e) {
+            $this->markTestSkipped("Failed to connect to the server with custom uri: {$configSaaSCustomURL->getSaaSEndPoint()}");
+        }
+    }
+
+    public function testSaaSMapperCustomURI2()
+    {
+        // vinil click -> click-vinyl (SaaS mapper)
+
+        $configSaaSCustomURL = new Config("test", "working", "qa", "saas",
+            "https://saas.searchhub.io/smartquery/v2/decathlon/de");
+
+        try {
+            $query = "farrad";
+            $client = new SearchHubClient($configSaaSCustomURL);
+            $result = $client->mapQuery($query);
+
+            $expected = new QueryMapping("farrad", "fahrrad", null);
 
             $this->assertEquals($expected, $result);
         } catch (\Exception $e) {
@@ -202,7 +223,7 @@ class SearchHubClientTest extends TestCase
         $SQLCache = new SQLCache($this->config);
         $mapper = new LocalMapper($this->config, $SQLCache);
         $result = $mapper->mapQuery($query);
-        $expected = new QueryMapping("aboba", "aboba", null);
+        $expected = new QueryMapping("aboba", null, null);
 
         $this->assertEquals($expected, $result);
     }
