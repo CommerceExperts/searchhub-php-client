@@ -85,14 +85,14 @@ class SearchHubClientTest extends TestCase
         // vinil click -> click-vinyl (SaaS mapper)
 
         $configSaaSCustomURL = new Config("test", "working", "qa", "saas",
-            "https://saas.searchhub.io/smartquery/v2/decathlon/de");
+            "https://saas.searchhub.io/smartquery/v2/demo/de");
 
         try {
-            $query = "farrad";
+            $query = "m.e.t.a.l.";
             $client = new SearchHubClient($configSaaSCustomURL);
             $result = $client->mapQuery($query);
 
-            $expected = new QueryMapping("farrad", "fahrrad", null);
+            $expected = new QueryMapping("m.e.t.a.l.", "metal", null);
 
             $this->assertEquals($expected, $result);
         } catch (\Exception $e) {

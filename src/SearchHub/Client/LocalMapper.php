@@ -124,7 +124,7 @@ class LocalMapper implements SearchHubMapperInterface
                         },
                         "queryMapperType": "SimpleQueryMapper",
                         "statsType": "mappingStats",
-                        "libVersion": "php-client 1.0"
+                        "libVersion": "php-client 2/php-version ' . phpversion() . '"
                     }
                 ]',
             json_encode($originalSearchString),
@@ -150,11 +150,11 @@ class LocalMapper implements SearchHubMapperInterface
             try {
                 $promise->wait();
             } catch (Exception $e) {
-//                $errorMessage = $e->getMessage();
-//                $errorCode = $e->getCode();
-//                $file = $e->getFile();
-//                $line = $e->getLine();
-//                //error_log("$originalSearchString Error: $errorMessage (Code: $errorCode) in $file on line $line");
+                $errorMessage = $e->getMessage();
+                $errorCode = $e->getCode();
+                $file = $e->getFile();
+                $line = $e->getLine();
+                error_log("$originalSearchString Error: $errorMessage (Code: $errorCode) in $file on line $line");
             }
         }
     }
