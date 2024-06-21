@@ -3,32 +3,15 @@
 namespace SearchHub\Client;
 
 use Exception;
-use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 
 class MappingDataUpdate
 {
-    private Config $config;
-    private Client $httpClient;
-
     function updateMappingData($config, $cache, $httpClient): void
     { //should have been called every 10-minute
-          $this->config = $config;
-//        if ($cache === null) {
-//            $cacheFactory = new CacheFactory($config);
-//            $cache = $cacheFactory->createCache();
-//        }
-//
-//        if ($httpClient === null) {
-//            $this->httpClient = new Client(['timeout' => SearchHubConstants::REQUEST_TIMEOUT]);
-//        } else {
-//            $this->httpClient = $httpClient;
-//        }
-
-
         try {
-            $uri = SearchHubConstants::getMappingQueriesEndpoint($this->config->getAccountName(), $this->config->getChannelName(), $this->config->getStage());
-            $mappingsResponse = $httpClient->get($uri, ['headers' => ['apikey' => $this->config->getClientApiKey()]]);
+            $uri = SearchHubConstants::getMappingQueriesEndpoint($config->getAccountName(), $config->getChannelName(), $config->getStage());
+            $mappingsResponse = $httpClient->get($uri, ['headers' => ['apikey' => $config->getClientApiKey()]]);
             assert($mappingsResponse instanceof Response);
             $indexedMappings = $this->indexMappings(json_decode($mappingsResponse->getBody()->getContents(), true));
             $cache->loadCache($indexedMappings);

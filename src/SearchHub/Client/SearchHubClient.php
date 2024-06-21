@@ -14,7 +14,7 @@ use GuzzleHttp\Exception\GuzzleException;
 class SearchHubClient {
 
     /*
-     * @return LocalMapper|SaaSMapper
+     * @var LocalMapper|SaaSMapper
      */
     private  $mapper;
 

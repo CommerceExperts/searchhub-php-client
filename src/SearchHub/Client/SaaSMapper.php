@@ -17,7 +17,7 @@ class SaaSMapper implements SearchHubMapperInterface
     /**
      * @var ClientInterface
      */
-    protected $httpClient;
+    protected ClientInterface $httpClient;
 
     public function __construct(Config $config, $url=null)
     {

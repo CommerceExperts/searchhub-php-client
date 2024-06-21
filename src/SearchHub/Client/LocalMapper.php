@@ -18,12 +18,12 @@ class LocalMapper implements SearchHubMapperInterface
     /**
      * @var ClientInterface
      */
-    private $httpClient;
+    private ClientInterface $httpClient;
 
     /**
      * @var Config
      */
-    private $config;
+    private Config $config;
 
     public function __construct(Config $config, MappingCacheInterface $cache=null)
     {
@@ -64,7 +64,7 @@ class LocalMapper implements SearchHubMapperInterface
     public function mapQuery($userQuery): QueryMapping
     {
         $startTimestamp = microtime(true);
-        $mappedQuery = $this->mappingCache->get($userQuery);;
+        $mappedQuery = $this->mappingCache->get($userQuery);
         $this->report(
             $userQuery,
             $mappedQuery->masterQuery,
