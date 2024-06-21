@@ -20,13 +20,13 @@ class SearchHubClientTest extends TestCase
     public function setUp(): void
     {
 
-        $this->config = new Config(API_KEY::API_KEY, "test", "working", "qa", "SaaS");
+        $this->config = new Config( "test", "working", "qa", "SaaS", null, API_KEY::API_KEY);
 
     }
 
     public function testByPassQuery1()
     {
-        //SaaS "vinil click" -> "vinil click"
+        //SaaS "vinil click" -> vinil click
 
         $this->config->setType("SaaS");
 
@@ -39,7 +39,7 @@ class SearchHubClientTest extends TestCase
 
     public function testByPassQuery2()
     {
-        // klick-vinyl -> \klick-vinyl
+        // \klick-vinyl -> \klick-vinyl
         $this->config->setType("SaaS");
 
         $query = "\\klick-vinyl";

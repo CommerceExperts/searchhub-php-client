@@ -13,14 +13,15 @@ use GuzzleHttp\Exception\GuzzleException;
  */
 class SearchHubClient {
 
-    /*
+    /**
      * @var LocalMapper|SaaSMapper
      */
     private  $mapper;
 
     public function __construct(Config $config)
     {
-        if ($config->getType() === "SaaS") {
+        if ($config->getType() === "saas")
+        {
             $this->mapper = new SaaSMapper($config);
         }
         else
@@ -36,12 +37,14 @@ class SearchHubClient {
     public function mapQuery(string $query) : QueryMapping
     {
         $query = mb_strtolower($query);  // All letters must be small
-        if (preg_match('/".*?"/', $query))//check "\"word\""
+        if (preg_match('/^\s*".*?"\s*$/', $query))//check "\"word\""
         {
-            return new QueryMapping($query, trim($query, '"'), null);
+            return new QueryMapping($query, trim($query, '" '), null);
             //
-        } else {
-            return $this->mapper->mapQuery($query);
+        }
+        else
+        {
+            return $this->mapper->mapQuery(trim($query, ' '));
         }
     }
 }

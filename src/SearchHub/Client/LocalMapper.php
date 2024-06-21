@@ -46,7 +46,7 @@ class LocalMapper implements SearchHubMapperInterface
         if ($this->mappingCache->isEmpty()){
             return True;
         }
-        if ($this->mappingCache->lastModifiedDate() + SearchHubConstants::MAPPING_CACHE_TTL <= time()){
+        if ($this->mappingCache->lastModifiedDate() + $this->config->getMappingCacheTTL() <= time()){
             if ($this->getSaaSLastModifiedDate() > $this->mappingCache->lastModifiedDate()){
                 return True;
             }
@@ -89,7 +89,7 @@ class LocalMapper implements SearchHubMapperInterface
     {
         if ($this->httpClient === null) {
             $this->httpClient = new Client([
-                'timeout' => (float)$timeOut ? $timeOut : SearchHubConstants::REQUEST_TIMEOUT,]);
+                'timeout' => (float)$timeOut ? $timeOut : $this->config->getRequestTimeout()]);
         }
         return $this->httpClient;
     }

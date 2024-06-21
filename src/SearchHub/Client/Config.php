@@ -7,7 +7,7 @@ class Config
     /**
      * @var string
      */
-    protected string $clientApiKey;
+    protected ?string $clientApiKey;
 
     /**
      * @var string
@@ -33,6 +33,16 @@ class Config
      * @var ?string
      */
     protected ?string $SaaSEndPoint=null;
+
+    /**
+     * Request timeout in milliseconds
+     */
+    protected int $requestTimeout = 1000;
+
+    /**
+     * TTL in seconds
+     */
+    protected int $mappingCacheTTL = 600;
 
     public function setClientApiKey($clientApiKey)
     {
@@ -88,7 +98,7 @@ class Config
 
     public function setType($type)
     {
-        $this->type = ($type !== "local") ? "SaaS" :  "local";
+        $this->type = ($type !== "local") ? "saas" :  "local";
     }
 
     /**
@@ -99,7 +109,33 @@ class Config
         return $this->type;
     }
 
-    private function setSaaSEndPoint($SaaSEndPoint)
+    public function setRequestTimeout(int $requestTimeout)
+    {
+        $this->requestTimeout = $requestTimeout;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRequestTimeout(): int
+    {
+        return $this->requestTimeout;
+    }
+
+    public function setMappingCacheTTL(int $mappingCacheTTL)
+    {
+        $this->mappingCacheTTL = $mappingCacheTTL;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMappingCacheTTL(): int
+    {
+        return $this->mappingCacheTTL;
+    }
+
+    public function setSaaSEndPoint($SaaSEndPoint)
     {
         $this->SaaSEndPoint = $SaaSEndPoint;
     }
@@ -147,7 +183,7 @@ class Config
     }
 
 
-    public function __construct($clientApiKey, $accountName, $channelName, $stage, $type, $customSaaSEndPoint=null){
+    public function __construct($accountName, $channelName, $stage, $type, $customSaaSEndPoint=null, $clientApiKey=null){
         $this->setClientApiKey($clientApiKey);
         $this->setAccountName($accountName);
         $this->setChannelName($channelName);

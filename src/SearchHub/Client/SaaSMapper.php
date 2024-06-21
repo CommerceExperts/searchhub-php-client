@@ -30,7 +30,7 @@ class SaaSMapper implements SearchHubMapperInterface
     {
         $url = $this->config->getSaaSEndPoint($userQuery);
 
-        $response = $this->getHttpClient()->get($url, ['headers' => ['apikey' => $this->config->getClientApiKey()]]);
+        $response = $this->getHttpClient()->get($url);
         assert($response instanceof Response);
         $mappedQuery = json_decode($response->getBody()->getContents(), true);
 
@@ -41,7 +41,7 @@ class SaaSMapper implements SearchHubMapperInterface
     {
         if ($this->httpClient === null) {
             $this->httpClient = new Client([
-                'timeout' => (float)$timeOut ? $timeOut : SearchHubConstants::REQUEST_TIMEOUT,]);
+                'timeout' => (float)$timeOut ? $timeOut : $this->config->getRequestTimeout()]);
         }
         return $this->httpClient;
     }
