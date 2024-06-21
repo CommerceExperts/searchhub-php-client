@@ -136,6 +136,7 @@ class LocalMapper implements SearchHubMapperInterface
             $this->config->getChannelName(),
         );
 
+
         if ($optimizedSearchString) {
             $url = $this->config->getMappingDataStatsEndpoint();
             $promise = $this->getHttpClient(0.5)->requestAsync('post', $url,
