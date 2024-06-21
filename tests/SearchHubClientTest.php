@@ -178,4 +178,81 @@ class SearchHubClientTest extends TestCase
         $expected = new QueryMapping("vinil click", "click-vinyl", null);
         $this->assertEquals($expected, $result);
     }
+
+    public function testSaaSMapperAwfulQuery()
+    {
+        // aboba -> aboba (SaaS mapper)
+        $this->config->setType("SaaS");
+
+        $query = "aboba";
+        $client = new SearchHubClient($this->config);
+        $result = $client->mapQuery($query);
+        $expected = new QueryMapping("aboba", "aboba", null);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testCacheSQLExistAwfulQuery()
+    {
+        // aboba -> aboba
+
+        $this->config->setType("local");
+        $query = "aboba";
+
+        $SQLCache = new SQLCache($this->config);
+        $mapper = new LocalMapper($this->config, $SQLCache);
+        $result = $mapper->mapQuery($query);
+        $expected = new QueryMapping("aboba", "aboba", null);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testCacheSQLEmptyAwfulQuery()
+    {
+        // aboba -> aboba
+
+        $this->config->setType("local");
+        $query = "aboba";
+
+        $SQLCache = new SQLCache($this->config);
+        $SQLCache->deleteCache();
+        $mapper = new LocalMapper($this->config, $SQLCache);
+        $result = $mapper->mapQuery($query);
+        $expected = new QueryMapping("aboba", "aboba", null);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testCacheFileExistAwfulQuery()
+    {
+        // aboba -> aboba
+
+        $this->config->setType("local");
+        $query = "aboba";
+
+        $fileCache = new FileMappingCache($this->config);
+        $mapper = new LocalMapper($this->config,$fileCache);
+        $result = $mapper->mapQuery($query);
+        $expected = new QueryMapping("aboba", "aboba", null);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testCacheFileEmptyAwfulQuery()
+    {
+        // aboba -> aboba
+
+        $this->config->setType("local");
+        $query = "aboba";
+
+        $fileCache = new FileMappingCache($this->config);
+        $fileCache->deleteCache();
+        $mapper = new LocalMapper($this->config,$fileCache);
+        $result = $mapper->mapQuery($query);
+        $expected = new QueryMapping("aboba", "aboba", null);
+        $this->assertEquals($expected, $result);
+    }
 }

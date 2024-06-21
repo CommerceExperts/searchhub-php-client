@@ -11,7 +11,6 @@ interface MappingCacheInterface
      * Optimize Query by sending it to searchhub checking whether there is a better performing
      * variant of the same search
      *
-     * @param void
      * @return void
      */
     public function deleteCache(): void;
@@ -24,7 +23,6 @@ interface MappingCacheInterface
      */
     public function loadCache(array $loadedCache): void;
 
-    //Check if there is cache?
     public function isEmpty(): bool;
 
     public function lastModifiedDate(): int;

@@ -4,9 +4,8 @@ namespace SearchHub\Client;
 
 class SearchHubConstants
 {
-
     /**
-     * @var string
+     * @var int
      */
     public const REQUEST_TIMEOUT = 1000;
 
@@ -14,5 +13,4 @@ class SearchHubConstants
      * TTL in seconds
      */
     public const MAPPING_CACHE_TTL = 600;
-
 }

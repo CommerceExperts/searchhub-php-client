@@ -18,21 +18,20 @@ class QueryMapping {
      */
     public ?string $redirect;
 
-
     /**
-     * Gets the search query.
+     * Sets the search query.
      *
-     * @return either the mapped master query or in case there is none, the initial user query.
+     * @sets either the mapped master query or in case there is none, the initial user query.
      */
-    public function getSearchQuery() :string
+    private function setSearchQuery($masterQuery) : void
     {
-       return $this->masterQuery == null ? $this->userQuery : $this->masterQuery;
+        $this->masterQuery = $masterQuery ?? $this->userQuery;
     }
 
     public function __construct(string $userQuery, ?string $masterQuery, ?string $redirect)
     {
         $this->userQuery = $userQuery;
-        $this->masterQuery = $masterQuery;
+        $this->setSearchQuery($masterQuery);
         $this->redirect = $redirect;
     }
 }

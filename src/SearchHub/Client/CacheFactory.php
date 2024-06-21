@@ -28,7 +28,7 @@ class CacheFactory
             //throw new Exception("DB did´t connected");
             return new SQLCache($this->config);
         }
-        catch(\Exception $e)
+        catch(Exception $e)
         {
             //If not connected to DB - use local Cache
             return new FileMappingCache($this->config);

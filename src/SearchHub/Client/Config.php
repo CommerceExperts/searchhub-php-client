@@ -2,8 +2,6 @@
 
 namespace SearchHub\Client;
 
-use GuzzleHttp\ClientInterface;
-
 class Config
 {
     /**
