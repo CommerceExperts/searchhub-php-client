@@ -9,7 +9,7 @@ class CacheFactory
     /**
      * @var Config
      */
-    private $config;
+    private Config $config;
 
 
     public function __construct($config)

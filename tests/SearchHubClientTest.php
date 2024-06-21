@@ -34,7 +34,7 @@ class SearchHubClientTest extends TestCase
         $client = new SearchHubClient($this->config);
         $result = $client->mapQuery($query);
 
-        $this->assertEquals(new QueryMapping("\"vinil click\"", "\"vinil click\"", null), $result);
+        $this->assertEquals(new QueryMapping("\"vinil click\"", "vinil click", null), $result);
     }
 
     public function testByPassQuery2()
@@ -65,16 +65,17 @@ class SearchHubClientTest extends TestCase
     public function testSaaSMapperCustomURI()
     {
         // vinil click -> click-vinyl (SaaS mapper)
+
+        $configSaaSCustomURL = new Config(API_KEY::API_KEY, "test", "working", "qa", "SaaS", "customURL");
         try {
-            $this->config->setType("SaaS");
             $query = "vinil click";
-            $mapper = new \SearchHub\Client\SaaSMapper($this->config, "new-uri");
-            $result = $mapper->mapQuery($query);
+            $client = new SearchHubClient($configSaaSCustomURL);
+            $result = $client->mapQuery($query);
             $expected = new QueryMapping("vinil click", "click-vinyl", null);
 
             $this->assertEquals($expected, $result);
         } catch (\Exception $e) {
-            $this->markTestSkipped('Failed to connect to the server with custom uri');
+            $this->markTestSkipped("Failed to connect to the server with custom uri: {$configSaaSCustomURL->getSaaSEndPoint()}");
         }
     }
 

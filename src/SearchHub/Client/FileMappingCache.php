@@ -20,7 +20,8 @@ class FileMappingCache implements MappingCacheInterface
      * Searching locale cache
      */
     public function __construct(Config $config){
-        $this->cache = new FilesystemCache("/tmp/cache/data/cache/searchhub/{$config->getAccountName()}/{$config->getChannelName()}/{$config->getStage()}");
+        $this->cache = new FilesystemCache($config->getFileSystemCacheDirectory());
+        //$this->cache = new FilesystemCache("/tmp/cache/data/cache/searchhub/{$config->getAccountName()}/{$config->getChannelName()}/{$config->getStage()}");
         $this->setKey($this->cache->generateKey($config->getAccountName(), $config->getChannelName()));
     }
 

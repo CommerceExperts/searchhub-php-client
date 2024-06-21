@@ -16,9 +16,9 @@ class LocalMapper implements SearchHubMapperInterface
     private  $mappingCache;
 
     /**
-     * @var ClientInterface
+     * @var ?ClientInterface
      */
-    private ClientInterface $httpClient;
+    private ?ClientInterface $httpClient = null;
 
     /**
      * @var Config
@@ -35,22 +35,33 @@ class LocalMapper implements SearchHubMapperInterface
         }
 
         $this->mappingCache = $cache;
-        if ($this->mappingCache->isEmpty() || ($this->getSaaSLastModifiedDate() > $this->mappingCache->lastModifiedDate())) {
-            $update = new MappingDataUpdate();
-            $update->updateMappingData($config, $this->mappingCache, $this->getHttpClient());
+        if ($this->updateRequire()) {
+                $update = new MappingDataUpdate();
+                $update->updateMappingData($config, $this->mappingCache, $this->getHttpClient());
+            }
+    }
+
+    private function updateRequire(): bool
+    {
+        if ($this->mappingCache->isEmpty()){
+            return True;
         }
+        if ($this->mappingCache->lastModifiedDate() + SearchHubConstants::MAPPING_CACHE_TTL <= time()){
+            if ($this->getSaaSLastModifiedDate() > $this->mappingCache->lastModifiedDate()){
+                return True;
+            }
+            else
+            {
+               $this->mappingCache->resetAge();
+            }
+        }
+
+        return False;
     }
 
     public function getSaaSLastModifiedDate(): int
     {
-        if ($this->config->getStage() === "qa")
-        {
-            $uri = "https://qa-api.searchhub.io/modificationTime?tenant={$this->config->getAccountName()}.{$this->config->getChannelName()}";
-        }
-        else
-        {
-            $uri = "https://api.searchhub.io/modificationTime?tenant={$this->config->getAccountName()}.{$this->config->getChannelName()}";
-        }
+        $uri = $this->config->getSaaSLastModifiedDateEndpoint();
 
         $response = $this->getHttpClient()->get($uri, ['headers' => ['apikey' => API_KEY::API_KEY]]);
         assert($response instanceof Response);
@@ -126,8 +137,9 @@ class LocalMapper implements SearchHubMapperInterface
         );
 
         if ($optimizedSearchString) {
-            $promise = $this->getHttpClient((float)0.3)->requestAsync('post', SearchHubConstants::getMappingDataStatsEndpoint($this->config->getStage()),
-                [
+            $url = $this->config->getMappingDataStatsEndpoint();
+            $promise = $this->getHttpClient(0.3)->requestAsync('post', $url,
+            [
                     'headers' => [
                         'apikey' => $this->config->getClientApiKey(),
                         'Content-Type' => 'application/json',

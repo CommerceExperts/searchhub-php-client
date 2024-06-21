@@ -7,10 +7,10 @@ use GuzzleHttp\Psr7\Response;
 
 class MappingDataUpdate
 {
-    function updateMappingData($config, $cache, $httpClient): void
+    function updateMappingData(Config $config, $cache, $httpClient): void
     { //should have been called every 10-minute
         try {
-            $uri = SearchHubConstants::getMappingQueriesEndpoint($config->getAccountName(), $config->getChannelName(), $config->getStage());
+            $uri = $config->getMappingQueriesEndpoint();
             $mappingsResponse = $httpClient->get($uri, ['headers' => ['apikey' => $config->getClientApiKey()]]);
             assert($mappingsResponse instanceof Response);
             $indexedMappings = $this->indexMappings(json_decode($mappingsResponse->getBody()->getContents(), true));

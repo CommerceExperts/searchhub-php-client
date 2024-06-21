@@ -10,24 +10,16 @@ use GuzzleHttp\Psr7\Response;
 
 class SaaSMapper implements SearchHubMapperInterface
 {
-    private ?string $url;
-
     private Config $config;
 
     /**
-     * @var ClientInterface
+     * @var ?ClientInterface
      */
-    protected ClientInterface $httpClient;
+    protected ?ClientInterface $httpClient=null;
 
-    public function __construct(Config $config, $url=null)
+    public function __construct(Config $config)
     {
-        $this->url = null;
-        if ($url !== null){
-            $this->url = $url;
-        }
-
         $this->config = $config;
-        //$this->url = $url;
     }
 
     /**
@@ -36,16 +28,9 @@ class SaaSMapper implements SearchHubMapperInterface
      */
     public function mapQuery($userQuery): QueryMapping
     {
-        if ($this->url === null)
-        {
-            $this->url = SearchHubConstants::getSaaSEndpoint($this->config->getStage(), $this->config->getAccountName(), $this->config->getChannelName(), $userQuery);
-        }
-        else
-        {
-            $this->url = $this->url . $userQuery;
-        }
+        $url = $this->config->getSaaSEndPoint($userQuery);
 
-        $response = $this->getHttpClient()->get($this->url, ['headers' => ['apikey' => $this->config->getClientApiKey()]]);
+        $response = $this->getHttpClient()->get($url, ['headers' => ['apikey' => $this->config->getClientApiKey()]]);
         assert($response instanceof Response);
         $mappedQuery = json_decode($response->getBody()->getContents(), true);
 

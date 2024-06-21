@@ -7,12 +7,12 @@ use SearchHub\Client\Config;
 use SearchHub\Client\SearchHubClient;
 
 
-$config = new Config(API_KEY::API_KEY, "test", "working", "qa", "SaaS");
+$config = new Config(API_KEY::API_KEY, "test", "working", "qa", "local");
 
 //$test = array ("vinil click", "sichtschuztzäune", "klick-vinyl", "aboba", "sichtschutz zaune",
 //    "außen wand leuchte", "waschbecken- unterschrank", "feder nut bretter", "kette säge", "außenleuchten mit bewegungsmelder");
 
-$test = array ("\"vinil click\"", "\"sichtschuztzäune\\", "\\klick-vinyl", "\"aboba\\", "\"aboba\"", "Cola \"Coca\"", "123", "finylböden", "wandaussenleuchten", "waschbecken mit untershrank");
+$test = array ("\"vinil click\"", "\"sichtschuztzäune\\", "\\klick-vinyl", "\"aboba\\", "\"feder. nut bretter\"", "Cola \"Coca\"", "123", "finylböden", "wandaussenleuchten", "waschbecken mit untershrank");
 $number = 1;
 
 $numberOfQueries = $number * count($test);

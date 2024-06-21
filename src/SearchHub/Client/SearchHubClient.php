@@ -36,9 +36,9 @@ class SearchHubClient {
     public function mapQuery(string $query) : QueryMapping
     {
         $query = mb_strtolower($query);  // All letters must be small
-        if (preg_match('/".*?"/', $query))//check "\"word\"""
+        if (preg_match('/".*?"/', $query))//check "\"word\""
         {
-            return new QueryMapping($query, $query, null);
+            return new QueryMapping($query, trim($query, '"'), null);
             //
         } else {
             return $this->mapper->mapQuery($query);
