@@ -8,9 +8,9 @@ use Twig\Cache\FilesystemCache;
 class FileMappingCache implements MappingCacheInterface
 {
     /**
-     * @var FilesystemCache|null
+     * @var FilesystemCache
      */
-    private ?FilesystemCache $cache;
+    private FilesystemCache $cache;
 
     /**
      * @var string
@@ -31,6 +31,9 @@ class FileMappingCache implements MappingCacheInterface
     }
 
 
+    /**
+     * @throws Exception
+     */
     public function get(string $query): QueryMapping
     {
         $query = mb_strtolower($query);
@@ -43,31 +46,36 @@ class FileMappingCache implements MappingCacheInterface
     /**
      * @throws Exception
      */
-    private function getCache(): ?array
+    private function getCache(): array
     {
-        if (file_exists($this->key)) {
+        if (file_exists($this->key))
+        {
             $json = file_get_contents($this->key);
-            if ($json === false) {
+
+            if ($json === false)
+            {
                 throw new Exception("Failed to read file: {$this->key}");
             }
 
-            if (empty($json)) {
-                return null;
+            if (empty($json))
+            {
+                throw new Exception("File is empty: {$this->key}");
             }
 
             $data = json_decode($json, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
+
+            if (json_last_error() !== JSON_ERROR_NONE)
+            {
                 throw new Exception("Failed to parse JSON: " . json_last_error_msg());
             }
 
             return $data;
         }
-
-        return null;
+        else
+        {
+            throw new Exception("File does not exist: {$this->key}");
+        }
     }
-
-
-
 
 
     public function deleteCache(): void
@@ -77,18 +85,10 @@ class FileMappingCache implements MappingCacheInterface
         }
     }
 
-    /*Uses for loading local file cache
+    /**Uses for loading local file cache
     $loadedCache = [
     'casaya aussenleuchten' => [
         'masterQuery' => 'casaya aussenleuchte',
-        'redirect' => ''
-    ],
-    'gorenje herd-set' => [
-        'masterQuery' => 'gorenje herd set',
-        'redirect' => ''
-    ],
-    'gorenje herd set' => [
-        'masterQuery' => 'gorenje herd set',
         'redirect' => ''
     ],
     ....

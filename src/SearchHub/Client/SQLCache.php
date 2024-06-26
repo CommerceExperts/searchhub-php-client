@@ -94,11 +94,11 @@ class SQLCache implements MappingCacheInterface
 
     public function lastModifiedDate(): int
     {
-        $filetime = filemtime($this->SQLName);
-        if ($filetime === false) { // Коректна перевірка на false
+        $lifetime = filemtime($this->SQLName);
+        if ($lifetime === false) { // Коректна перевірка на false
             throw new Error("Cannot access DB");
         }
-        return $filetime;
+        return $lifetime;
     }
 
     public function resetAge(): void

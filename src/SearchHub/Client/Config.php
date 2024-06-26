@@ -140,7 +140,7 @@ class Config
         $this->SaaSEndPoint = $SaaSEndPoint;
     }
 
-    public function getSaaSEndpoint(string $userQuery=null): ?string
+    public function getSaaSEndpoint(string $userQuery=null): string
     {
         if ($this->SaaSEndPoint === null){
             return "https://{$this->stage}-saas.searchhub.io/smartquery/v2/{$this->accountName}/{$this->channelName}?userQuery={$userQuery}";

@@ -26,8 +26,16 @@ class MappingDataUpdate
         }
     }
 
-    protected function indexMappings($mappingsRaw): array
+    /**
+     * @throws Exception
+     */
+    protected function indexMappings(?array $mappingsRaw): array
     {
+        if ($mappingsRaw === null)
+        {
+            throw new Exception("Failed to retrieve data from the server.");
+        }
+
         $indexedMappings = array();
         if (isset($mappingsRaw["clusters"]) && is_array($mappingsRaw["clusters"])) { //v2
             foreach ($mappingsRaw["clusters"] as $mapping) {

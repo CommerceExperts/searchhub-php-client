@@ -18,9 +18,9 @@ class MappingCacheMock  implements MappingCacheInterface
         $this->isOld = $isOld;
     }
 
-    public function get(string $query): ?QueryMapping
+    public function get(string $query): QueryMapping
     {
-        return null;
+        return new QueryMapping("1", "1", null);
     }
 
     public function deleteCache(): void
