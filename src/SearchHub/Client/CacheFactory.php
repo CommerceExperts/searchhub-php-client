@@ -12,7 +12,7 @@ class CacheFactory
     private Config $config;
 
 
-    public function __construct($config)
+    public function __construct(Config $config)
     {
         $this->config = $config;
     }

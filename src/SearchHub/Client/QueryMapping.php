@@ -9,9 +9,9 @@ class QueryMapping {
     public string $userQuery;
 
     /**
-     * @var string|null
+     * @var string
      */
-    public ?string $masterQuery;
+    public string $masterQuery;
 
     /**
      * @var string|null
@@ -23,7 +23,7 @@ class QueryMapping {
      *
      * @sets either the mapped master query or in case there is none, the initial user query.
      */
-    private function setSearchQuery($masterQuery) : void
+    private function setSearchQuery(?string $masterQuery) : void
     {
         $this->masterQuery = $masterQuery ?? $this->userQuery;
     }

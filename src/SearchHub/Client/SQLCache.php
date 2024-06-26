@@ -2,14 +2,16 @@
 
 namespace SearchHub\Client;
 
+use Error;
+use Exception;
 use PDO;
 
 class SQLCache implements MappingCacheInterface
 {
     /**
-     * @var PDO|null
+     * @var PDO
      */
-    private ?PDO $db;
+    private PDO $db;
 
     private string $SQLName;
 
@@ -70,9 +72,17 @@ class SQLCache implements MappingCacheInterface
         $this->resetAge();
     }
 
+    /**
+     * @throws Exception
+     */
     public function deleteCache(): void
     {
-        $this->db->exec("DELETE FROM queries");
+        $result = $this->db->query("SELECT COUNT(*) FROM queries");
+        $rowCount = $result->fetchColumn();
+
+        if ($rowCount > 0) {
+            $this->db->exec("DELETE FROM queries");
+        }
     }
 
     public function isEmpty(): bool
@@ -84,7 +94,11 @@ class SQLCache implements MappingCacheInterface
 
     public function lastModifiedDate(): int
     {
-        return filemtime($this->SQLName);
+        $filetime = filemtime($this->SQLName);
+        if ($filetime === false) { // Коректна перевірка на false
+            throw new Error("Cannot access DB");
+        }
+        return $filetime;
     }
 
     public function resetAge(): void

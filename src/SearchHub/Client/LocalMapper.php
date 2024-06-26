@@ -5,20 +5,19 @@ namespace SearchHub\Client;
 use App\MappingCacheMock;
 use Exception;
 use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
 
 class LocalMapper implements SearchHubMapperInterface
 {
     /**
-     * @var FileMappingCache|SQLCache|MappingCacheMock
+     * @var MappingCacheInterface
      */
     private  $mappingCache;
 
     /**
-     * @var ?ClientInterface
+     * @var ?Client
      */
-    private ?ClientInterface $httpClient = null;
+    private ?Client $httpClient = null;
 
     /**
      * @var Config
@@ -63,7 +62,7 @@ class LocalMapper implements SearchHubMapperInterface
     {
         $uri = $this->config->getSaaSLastModifiedDateEndpoint();
 
-        $response = $this->getHttpClient()->get($uri, ['headers' => ['apikey' => API_KEY::API_KEY]]);
+        $response = $this->getHttpClient()->get($uri, ['headers' => ['apikey' => $this->config->getClientApiKey()]]);
         assert($response instanceof Response);
 
         return (int)json_decode($response->getBody()->getContents(), true) / 1000;
@@ -72,7 +71,7 @@ class LocalMapper implements SearchHubMapperInterface
     /**
      * @throws Exception
      */
-    public function mapQuery($userQuery): QueryMapping
+    public function mapQuery(string $userQuery): QueryMapping
     {
         $startTimestamp = microtime(true);
         $mappedQuery = $this->mappingCache->get($userQuery);
@@ -85,7 +84,7 @@ class LocalMapper implements SearchHubMapperInterface
         return $mappedQuery;
     }
 
-    protected function getHttpClient($timeOut = null): ClientInterface
+    protected function getHttpClient(float $timeOut = null): Client
     {
         if ($this->httpClient === null) {
             $this->httpClient = new Client([

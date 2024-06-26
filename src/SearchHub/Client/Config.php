@@ -5,7 +5,7 @@ namespace SearchHub\Client;
 class Config
 {
     /**
-     * @var string
+     * @var string|null
      */
     protected ?string $clientApiKey;
 
@@ -20,9 +20,9 @@ class Config
     protected string $channelName;
 
     /**
-     * @var string|null
+     * @var string
      */
-    protected ?string $stage="prod";
+    protected string $stage="prod";
 
     /**
      * @var string
@@ -30,7 +30,7 @@ class Config
     protected string $type;
 
     /**
-     * @var ?string
+     * @var string|null
      */
     protected ?string $SaaSEndPoint=null;
 
@@ -44,7 +44,7 @@ class Config
      */
     protected int $mappingCacheTTL = 600;
 
-    public function setClientApiKey($clientApiKey)
+    public function setClientApiKey(?string $clientApiKey): void
     {
         $this->clientApiKey = $clientApiKey;
     }
@@ -52,12 +52,12 @@ class Config
     /**
      * @return string
      */
-    public function getClientApiKey(): string
+    public function getClientApiKey(): ?string
     {
         return $this->clientApiKey;
     }
 
-    public function setAccountName($accountName)
+    public function setAccountName(string $accountName): void
     {
         $this->accountName = $accountName;
     }
@@ -70,7 +70,7 @@ class Config
         return $this->accountName;
     }
 
-    public function setChannelName($channelName)
+    public function setChannelName(string $channelName): void
     {
         $this->channelName = $channelName;
     }
@@ -83,7 +83,7 @@ class Config
         return $this->channelName;
     }
 
-    public function setStage($stage = null)
+    public function setStage(string $stage = null): void
     {
         $this->stage = ($stage === "qa") ? "qa" : "prod";
     }
@@ -91,12 +91,12 @@ class Config
     /**
      * @return string
      */
-    public function getStage(): ?string
+    public function getStage(): string
     {
         return $this->stage;
     }
 
-    public function setType($type)
+    public function setType(string $type): void
     {
         $this->type = ($type !== "local") ? "saas" :  "local";
     }
@@ -109,7 +109,7 @@ class Config
         return $this->type;
     }
 
-    public function setRequestTimeout(int $requestTimeout)
+    public function setRequestTimeout(int $requestTimeout): void
     {
         $this->requestTimeout = $requestTimeout;
     }
@@ -122,7 +122,7 @@ class Config
         return $this->requestTimeout;
     }
 
-    public function setMappingCacheTTL(int $mappingCacheTTL)
+    public function setMappingCacheTTL(int $mappingCacheTTL): void
     {
         $this->mappingCacheTTL = $mappingCacheTTL;
     }
@@ -135,7 +135,7 @@ class Config
         return $this->mappingCacheTTL;
     }
 
-    public function setSaaSEndPoint($SaaSEndPoint)
+    public function setSaaSEndPoint(?string $SaaSEndPoint): void
     {
         $this->SaaSEndPoint = $SaaSEndPoint;
     }
@@ -193,17 +193,16 @@ class Config
      * @param string $channelName The name of the channel
      * @param string $stage The stage/environment  ("qa" or "prod").
      * @param string $type The type of mapper being instantiated ("local" or "saas").
-     * @param string|null $customSaaSEndPoint Optional. Custom SaaS endpoint URL for SaaS mapping.
-     *                                      Format example: "customURL=$query".
+     * @param string|null $SaaSEndPoint
      * @param string|null $clientApiKey Optional. API key required for local mapping for client authentication.
      */
-    public function __construct(string $accountName, string $channelName, string $stage, string $type, ?string $customSaaSEndPoint = null, ?string $clientApiKey = null)
+    public function __construct(string $accountName, string $channelName, string $stage, string $type, ?string $SaaSEndPoint = null, ?string $clientApiKey = null)
     {
         $this->setClientApiKey($clientApiKey);
         $this->setAccountName($accountName);
         $this->setChannelName($channelName);
         $this->setStage($stage);
         $this->setType($type);
-        $this->setSaaSEndPoint($customSaaSEndPoint);
+        $this->setSaaSEndPoint($SaaSEndPoint);
     }
 }

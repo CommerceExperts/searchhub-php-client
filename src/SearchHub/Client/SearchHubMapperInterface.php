@@ -4,6 +4,6 @@ namespace SearchHub\Client;
 
 interface SearchHubMapperInterface
 {
-    public function mapQuery($userQuery): QueryMapping;
+    public function mapQuery(string $userQuery): QueryMapping;
 
 }

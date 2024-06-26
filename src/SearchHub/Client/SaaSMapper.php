@@ -4,7 +4,6 @@ namespace SearchHub\Client;
 
 use Exception;
 use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 
@@ -13,9 +12,9 @@ class SaaSMapper implements SearchHubMapperInterface
     private Config $config;
 
     /**
-     * @var ?ClientInterface
+     * @var ?Client
      */
-    protected ?ClientInterface $httpClient=null;
+    protected ?Client $httpClient=null;
 
     public function __construct(Config $config)
     {
@@ -26,7 +25,7 @@ class SaaSMapper implements SearchHubMapperInterface
      * @throws Exception
      * @throws GuzzleException
      */
-    public function mapQuery($userQuery): QueryMapping
+    public function mapQuery(string $userQuery): QueryMapping
     {
         $url = $this->config->getSaaSEndPoint($userQuery);
 
@@ -37,7 +36,7 @@ class SaaSMapper implements SearchHubMapperInterface
         return new QueryMapping($userQuery, $mappedQuery ? $mappedQuery["masterQuery"] : $userQuery, $mappedQuery ? $mappedQuery["redirect"] : null);
     }
 
-    protected function getHttpClient($timeOut = null): ClientInterface
+    protected function getHttpClient(int $timeOut = null): Client
     {
         if ($this->httpClient === null) {
             $this->httpClient = new Client([

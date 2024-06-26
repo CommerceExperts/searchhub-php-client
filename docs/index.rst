@@ -84,7 +84,7 @@ Initializes the object with provided parameters, setting up the account name, ch
 - @param string $channelName: The channel name.
 - @param string $stage: The stage/environment ("qa" or "prod").
 - @param string $type: The type of mapper instantiated ("local" or "saas").
-- @param string|null $customSaaSEndPoint: Optional. Custom SaaS endpoint URL for SaaS mapping. Format example: "customURL=$query".
+- @param string|null $SaaSEndPoint: Optional. Custom SaaS endpoint URL for SaaS mapping. Format example: "customURL=$query".
 - @param string|null $clientApiKey: Optional. API key required for local mapping for client authentication.
 
 SearchHubClient

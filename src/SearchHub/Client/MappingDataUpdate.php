@@ -4,6 +4,7 @@ namespace SearchHub\Client;
 
 use Exception;
 use GuzzleHttp\Psr7\Response;
+use http\Client;
 
 class MappingDataUpdate
 {

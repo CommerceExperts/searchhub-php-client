@@ -19,7 +19,7 @@ interface MappingCacheInterface
     /**
      * Rewrite cache
      *
-     * @param array $loadedCache in form [$query => {"masterQuery" => "", "redirect" => ""}]
+     * @param array $loadedCache in form [$query => {"masterQuery" => "", "redirect" => ""}, ...]
      * @return void
      */
     public function loadCache(array $loadedCache): void;

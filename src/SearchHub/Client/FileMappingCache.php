@@ -12,9 +12,9 @@ class FileMappingCache implements MappingCacheInterface
     private ?FilesystemCache $cache;
 
     /**
-     * @var string|null
+     * @var string
      */
-    private ?string $key;
+    private string $key;
 
     /**
      * Searching locale cache
@@ -24,7 +24,7 @@ class FileMappingCache implements MappingCacheInterface
         $this->setKey($this->cache->generateKey($config->getAccountName(), $config->getChannelName()));
     }
 
-    private function setKey($key): void
+    private function setKey(string $key): void
     {
         $this->key = $key;
     }
@@ -44,6 +44,7 @@ class FileMappingCache implements MappingCacheInterface
         if (file_exists($this->key) ) {
             return json_decode(file_get_contents($this->key), true);
         }
+
         return null;
     }
 
@@ -54,6 +55,24 @@ class FileMappingCache implements MappingCacheInterface
         }
     }
 
+    /*Uses for loading local file cache
+    $loadedCache = [
+    'casaya aussenleuchten' => [
+        'masterQuery' => 'casaya aussenleuchte',
+        'redirect' => ''
+    ],
+    'gorenje herd-set' => [
+        'masterQuery' => 'gorenje herd set',
+        'redirect' => ''
+    ],
+    'gorenje herd set' => [
+        'masterQuery' => 'gorenje herd set',
+        'redirect' => ''
+    ],
+    ....
+    ];
+
+    */
     public function loadCache(array $loadedCache): void
     {
         $this->cache->write($this->key, json_encode($loadedCache));

@@ -4,7 +4,6 @@ namespace App;
 
 use SearchHub\Client\MappingCacheInterface;
 use SearchHub\Client\QueryMapping;
-use SearchHub\Client\SearchHubConstants;
 
 class MappingCacheMock  implements MappingCacheInterface
 {
