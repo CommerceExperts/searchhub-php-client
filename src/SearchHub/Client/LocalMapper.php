@@ -137,9 +137,8 @@ class LocalMapper implements SearchHubMapperInterface
 
         if ($optimizedSearchString) {
             $url = $this->config->getMappingDataStatsEndpoint();
-            // TODO: make timeout configurable via Config.php using 0.5 as default ($this->config->getReportTimeout())
             // FIXME? is timeout set in milliseconds or seconds? $config->requestTimeout is set to 1000 per default...
-            $promise = $this->getHttpClient(1)->requestAsync('post', $url,
+            $promise = $this->getHttpClient($this->config->getReportTimeout())->requestAsync('post', $url,
             [
                     'headers' => [
                         'apikey' => $this->config->getClientApiKey(),
@@ -149,8 +148,10 @@ class LocalMapper implements SearchHubMapperInterface
                 ]
             );
             try {
+                echo "trying" . $this->config->getReportTimeout();
                 $promise->wait();
             } catch (Exception $e) {
+                echo "good";
                 $errorMessage = $e->getMessage();
                 $errorCode = $e->getCode();
                 $file = $e->getFile();

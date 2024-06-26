@@ -18,6 +18,13 @@ class QueryMapping {
      */
     public ?string $redirect;
 
+    public function __construct(string $userQuery, ?string $masterQuery, ?string $redirect)
+    {
+        $this->userQuery = $userQuery;
+        $this->setSearchQuery($masterQuery);
+        $this->redirect = $redirect;
+    }
+
     /**
      * Sets the search query.
      *
@@ -26,14 +33,6 @@ class QueryMapping {
     private function setSearchQuery(?string $masterQuery) : void
     {
         $this->masterQuery = $masterQuery ?? $this->userQuery;
-    }
-
-    // TODO: __construct should always be the first function
-    public function __construct(string $userQuery, ?string $masterQuery, ?string $redirect)
-    {
-        $this->userQuery = $userQuery;
-        $this->setSearchQuery($masterQuery);
-        $this->redirect = $redirect;
     }
 }
 

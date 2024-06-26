@@ -35,9 +35,14 @@ class Config
     protected ?string $SaaSEndPoint=null;
 
     /**
-     * Request timeout in seconds
+     * Request timeout in seconds. By default - //TODO seconds or milliseconds
      */
-    protected int $requestTimeout = 10;
+    protected float $requestTimeout = 10;
+
+    /**
+     * Report timeout in seconds. By default - 0.5 //TODO Why dont works with 0.01
+     */
+    protected float $reportTimeout = 0.01;
 
     /**
      * TTL in seconds
@@ -112,18 +117,35 @@ class Config
     /**
      * $requestTimeout in seconds, can be float value
      */
-    public function setRequestTimeout(int $requestTimeout): void
+    public function setRequestTimeout(float $requestTimeout): void
     {
         $this->requestTimeout = $requestTimeout;
     }
 
     /**
-     * @return int
+     * @return float
      */
-    public function getRequestTimeout(): int
+    public function getRequestTimeout(): float
     {
         return $this->requestTimeout;
     }
+
+    /**
+     * $reportTimeout in seconds, can be float value
+     */
+    public function setReportTimeout(float $reportTimeout): void
+    {
+        $this->reportTimeout = $reportTimeout;
+    }
+
+    /**
+     * @return float
+     */
+    public function getReportTimeout(): float
+    {
+        return $this->reportTimeout;
+    }
+
 
     public function setMappingCacheTTL(int $mappingCacheTTL): void
     {
