@@ -2,7 +2,7 @@
 
 require 'MappingCacheMock.php';
 
-//use App\MappingCacheMock;
+use App\MappingCacheMock;
 use PHPUnit\Framework\TestCase;
 
 use SearchHub\Client\Config;
@@ -16,13 +16,11 @@ use SearchHub\Client\SQLCache;
 class SearchHubClientTest extends TestCase
 {
 
-    protected \SearchHub\Client\Config $config;
+    protected Config $config;
 
     public function setUp(): void
     {
-
         $this->config = new Config( "test", "working", "qa", "SaaS", null, getenv('SH_API_KEY'));
-
     }
 
     public function testByPassQuery1()

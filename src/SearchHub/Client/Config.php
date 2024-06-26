@@ -182,10 +182,9 @@ class Config
      */
     public function getFileSystemCacheDirectory(): string
     {
-        // FIXME: use sys_get_temp_dir() http://doc.php.sh/en/function.sys-get-temp-dir.html
-        // default: mkdir(sys_get_temp_dir().'/cache/')
         // TODO: $cache->setFileSystemCacheDirectory($dir)
-        return "/tmp/cache/data/cache/searchhub/{$this->accountName}/{$this->channelName}/{$this->stage}";
+        //return "/tmp/cache/data/cache/searchhub/{$this->accountName}/{$this->channelName}/{$this->stage}";
+        return sys_get_temp_dir() . "/";
     }
 
     /**
