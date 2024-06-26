@@ -1,5 +1,5 @@
 {
-    "name": "searchhub-php-client",
+    "name": "searchhub/php-client",
     "type": "library",
     "description": "maps similar searches to best query",
     "keywords": ["mapping","search optimization"],
@@ -20,11 +20,8 @@
     "require": {
         "php": ">=7.4.9",
         "ext-json": "*",
-        "ext-pdo": "*",
         "guzzlehttp/guzzle": "^7.8",
-        "twig/cache-extension": "^1.5",
-        "symfony/deprecation-contracts": "2.5",
-        "symfony/framework-bundle": "5.4"
+        "twig/twig": "^3.10"
     },
     "autoload": {
         "psr-4": {
@@ -35,8 +32,8 @@
 
     "require-dev": {
         "phpstan/phpstan": "^1.11",
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9.5",
+        "icanhazstring/composer-unused": "dev-main"
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    "minimum-stability": "stable"
 }
