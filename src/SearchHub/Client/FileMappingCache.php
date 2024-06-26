@@ -2,6 +2,7 @@
 
 namespace SearchHub\Client;
 
+use Exception;
 use Twig\Cache\FilesystemCache;
 
 class FileMappingCache implements MappingCacheInterface
@@ -39,14 +40,35 @@ class FileMappingCache implements MappingCacheInterface
         return new QueryMapping($query, $masterQuery, $redirect);
     }
 
-    private function getCache()
+    /**
+     * @throws Exception
+     */
+    private function getCache(): ?array
     {
-        if (file_exists($this->key) ) {
-            return json_decode(file_get_contents($this->key), true);
+        if (file_exists($this->key)) {
+            $json = file_get_contents($this->key);
+            if ($json === false) {
+                throw new Exception("Failed to read file: {$this->key}");
+            }
+
+            if (empty($json)) {
+                return null;
+            }
+
+            $data = json_decode($json, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception("Failed to parse JSON: " . json_last_error_msg());
+            }
+
+            return $data;
         }
 
         return null;
     }
+
+
+
+
 
     public function deleteCache(): void
     {

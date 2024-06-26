@@ -2,7 +2,6 @@
 
 namespace SearchHub\Client;
 
-use App\MappingCacheMock;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;

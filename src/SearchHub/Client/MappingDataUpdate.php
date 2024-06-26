@@ -3,12 +3,13 @@
 namespace SearchHub\Client;
 
 use Exception;
+use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
-use http\Client;
+
 
 class MappingDataUpdate
 {
-    function updateMappingData(Config $config, $cache, $httpClient): void
+    function updateMappingData(Config $config, MappingCacheInterface $cache, Client $httpClient): void
     { //should have been called every 10-minute
         try {
             $uri = $config->getMappingQueriesEndpoint();
