@@ -27,7 +27,7 @@ class Config
     /**
      * @var string
      */
-    protected string $type;
+    protected string $type="saas";
 
     /**
      * @var string|null
@@ -35,9 +35,9 @@ class Config
     protected ?string $SaaSEndPoint=null;
 
     /**
-     * Request timeout in milliseconds
+     * Request timeout in seconds
      */
-    protected int $requestTimeout = 1000;
+    protected int $requestTimeout = 10;
 
     /**
      * TTL in seconds
@@ -109,6 +109,9 @@ class Config
         return $this->type;
     }
 
+    /**
+     * $requestTimeout in seconds, can be float value
+     */
     public function setRequestTimeout(int $requestTimeout): void
     {
         $this->requestTimeout = $requestTimeout;
@@ -143,7 +146,7 @@ class Config
     public function getSaaSEndpoint(string $userQuery=null): string
     {
         if ($this->SaaSEndPoint === null){
-            return "https://{$this->stage}-saas.searchhub.io/smartquery/v2/{$this->accountName}/{$this->channelName}?userQuery={$userQuery}";
+            return "https://" . ($this->stage === "qa" ? "qa-" : "") . "saas.searchhub.io/smartquery/v2/{$this->accountName}/{$this->channelName}?userQuery={$userQuery}";
         } else {
             return $this->SaaSEndPoint ."?userQuery=". $userQuery;
         }
@@ -179,6 +182,9 @@ class Config
      */
     public function getFileSystemCacheDirectory(): string
     {
+        // FIXME: use sys_get_temp_dir() http://doc.php.sh/en/function.sys-get-temp-dir.html
+        // default: mkdir(sys_get_temp_dir().'/cache/')
+        // TODO: $cache->setFileSystemCacheDirectory($dir)
         return "/tmp/cache/data/cache/searchhub/{$this->accountName}/{$this->channelName}/{$this->stage}";
     }
 

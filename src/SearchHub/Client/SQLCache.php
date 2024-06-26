@@ -18,6 +18,9 @@ class SQLCache implements MappingCacheInterface
 
     public function __construct(Config $config)
     {
+        //TODO: use sys_get_temp_dir (http://doc.php.sh/en/function.sys-get-temp-dir.html)
+        //      to write to temporary directory. otherwise this might write somewhere into the library path
+        // better use $config->getFileSystemCacheDirectory()
         $this->SQLName = "database.{$config->getAccountName()}.{$config->getChannelName()}.{$config->getStage()}.sqlite";
         $this->db = new PDO('sqlite:'. $this->SQLName);
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -26,11 +29,11 @@ class SQLCache implements MappingCacheInterface
         //If table don´t exist - create
         if ($result->fetch() === false) {
             $createTableQuery = "
-            CREATE TABLE queries (
-            userQuery VARCHAR(255) PRIMARY KEY,
-            masterQuery VARCHAR(255),
-            redirect VARCHAR(255)
-        )";
+                CREATE TABLE queries (
+                userQuery VARCHAR(255) PRIMARY KEY,
+                masterQuery VARCHAR(255),
+                redirect VARCHAR(255)
+            )";
             $this->db->exec($createTableQuery);
         }
     }

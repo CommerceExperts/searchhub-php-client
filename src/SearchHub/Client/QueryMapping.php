@@ -28,6 +28,7 @@ class QueryMapping {
         $this->masterQuery = $masterQuery ?? $this->userQuery;
     }
 
+    // TODO: __construct should always be the first function
     public function __construct(string $userQuery, ?string $masterQuery, ?string $redirect)
     {
         $this->userQuery = $userQuery;

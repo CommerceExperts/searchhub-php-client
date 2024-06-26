@@ -1,9 +1,10 @@
 <?php
 
-use App\MappingCacheMock;
+require 'MappingCacheMock.php';
+
+//use App\MappingCacheMock;
 use PHPUnit\Framework\TestCase;
 
-use SearchHub\Client\API_KEY;
 use SearchHub\Client\Config;
 use SearchHub\Client\FileMappingCache;
 use SearchHub\Client\LocalMapper;
@@ -20,7 +21,7 @@ class SearchHubClientTest extends TestCase
     public function setUp(): void
     {
 
-        $this->config = new Config( "test", "working", "qa", "SaaS", null, API_KEY::API_KEY);
+        $this->config = new Config( "test", "working", "qa", "SaaS", null, getenv('SH_API_KEY'));
 
     }
 

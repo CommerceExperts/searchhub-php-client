@@ -4,16 +4,14 @@ namespace SearchHub\Client;
 
 interface MappingCacheInterface
 {
-
-    public function get(string $query): QueryMapping;
-
-
     /**
      * Optimize Query by sending it to searchhub checking whether there is a better performing
      * variant of the same search
      *
      * @return void
      */
+    public function get(string $query): QueryMapping;
+
     public function deleteCache(): void;
 
 

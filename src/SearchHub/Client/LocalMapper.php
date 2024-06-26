@@ -137,7 +137,9 @@ class LocalMapper implements SearchHubMapperInterface
 
         if ($optimizedSearchString) {
             $url = $this->config->getMappingDataStatsEndpoint();
-            $promise = $this->getHttpClient(0.5)->requestAsync('post', $url,
+            // TODO: make timeout configurable via Config.php using 0.5 as default ($this->config->getReportTimeout())
+            // FIXME? is timeout set in milliseconds or seconds? $config->requestTimeout is set to 1000 per default...
+            $promise = $this->getHttpClient(1)->requestAsync('post', $url,
             [
                     'headers' => [
                         'apikey' => $this->config->getClientApiKey(),
@@ -153,7 +155,7 @@ class LocalMapper implements SearchHubMapperInterface
                 $errorCode = $e->getCode();
                 $file = $e->getFile();
                 $line = $e->getLine();
-                error_log("$originalSearchString Error: $errorMessage (Code: $errorCode) in $file on line $line");
+                error_log("Sending searchHub mapping-stats failed for query '$originalSearchString'. Consider increasing report_timeout in config. Error: $errorMessage (Code: $errorCode) in $file on line $line");
             }
         }
     }

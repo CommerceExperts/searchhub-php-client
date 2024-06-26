@@ -7,7 +7,7 @@ use SearchHub\Client\Config;
 use SearchHub\Client\SearchHubClient;
 
 
-$config = new Config( "test", "working", "qa", "saas", null, API_KEY::API_KEY);
+$config = new Config( "test", "working", "qa", "saas", null, getenv('SH_API_KEY'));
 
 
 //$test = array ("vinil click", "sichtschuztzäune", "klick-vinyl", "aboba", "sichtschutz zaune",
@@ -37,7 +37,7 @@ echo "\t\t$numberOfQueries query:\n" . "Total time: " . $executionTime . "s\nAve
 
 
 echo"\n\n\n\n\tLocal mapper:";
-$config = new Config( "test", "working", "qa", "local", null, API_KEY::API_KEY);
+$config = new Config( "test", "working", "qa", "local", null, getenv('SH_API_KEY'));
 $start = microtime(true);
 
 $client = new SearchHubClient($config);
