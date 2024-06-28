@@ -1,5 +1,5 @@
 {
-    "name": "searchhub/php-client",
+    "name": "cxp/searchhub-php-client",
     "type": "library",
     "description": "maps similar searches to best query",
     "keywords": ["mapping","search optimization"],

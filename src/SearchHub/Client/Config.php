@@ -228,9 +228,10 @@ class Config
     private function createFolderForCache(): void
     {
         $this->cacheFolder = sys_get_temp_dir() . "/SearchHub-{$this->accountName}-{$this->channelName}-{$this->stage}/";
-        if (!is_dir($this->cacheFolder)) {
+        if (!is_dir($this->cacheFolder))
+        {
             mkdir($this->cacheFolder, 0777, true);
-            }
+        }
     }
 
     /**

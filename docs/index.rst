@@ -56,18 +56,18 @@ Requirements
 - If using a firewall, configure it to allow connections to the following HTTPS endpoints:
     - https://api.searchhub.io/
     - https://import.searchhub.io/
-    - https://prod-saas.searchhub.io/
+    - https://saas.searchhub.io/
 
 Composer Dependency
 -------------------
 
-The smartQueryPHP library can be added as a composer dependency `searchhub-php-client`.
+The smartQueryPHP library can be added as a composer dependency `cxp/searchhub-php-client`.
 
 .. code-block:: json
 
    {
      "require": {
-       "searchhub-php-client": "1.0.0"
+       "cxp/searchhub-php-client": "1.0.0"
      }
    }
 
