@@ -83,11 +83,11 @@ class LocalMapper implements SearchHubMapperInterface
         return $mappedQuery;
     }
 
-    protected function getHttpClient(float $timeOut = null): Client
+    protected function getHttpClient(?float $timeOut = null): Client //TODO Can user give null as parameter?
     {
         if ($this->httpClient === null) {
             $this->httpClient = new Client([
-                'timeout' => (float)($timeOut ?? $this->config->getRequestTimeout())
+                'timeout' => (float)($timeOut ?? $this->config->getMappingDataUpdateTimeout())
 ]);
         }
         return $this->httpClient;

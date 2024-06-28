@@ -18,7 +18,7 @@ class CacheFactory
     }
 
     /**
-     * @return SQLCache|FileMappingCache
+     * @return MappingCacheInterface
      */
     public function createCache()
     {

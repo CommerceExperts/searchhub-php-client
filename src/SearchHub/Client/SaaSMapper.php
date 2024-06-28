@@ -36,13 +36,14 @@ class SaaSMapper implements SearchHubMapperInterface
         return new QueryMapping($userQuery, $mappedQuery ? $mappedQuery["masterQuery"] : $userQuery, $mappedQuery ? $mappedQuery["redirect"] : null);
     }
 
-    protected function getHttpClient(int $timeOut = null): Client
+    protected function getHttpClient(float $timeOut = null): Client
     {
         if ($this->httpClient === null) {
             $this->httpClient = new Client([
-                'timeout' => (float)($timeOut ?? $this->config->getRequestTimeout())
+                'timeout' => (float)($timeOut ?? $this->config->getRequestSaaSTimeout())
             ]);
         }
         return $this->httpClient;
     }
+
 }

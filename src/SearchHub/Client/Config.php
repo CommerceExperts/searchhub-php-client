@@ -35,9 +35,14 @@ class Config
     protected ?string $SaaSEndPoint=null;
 
     /**
-     * Request timeout in seconds. By default - 5//TODO by default? Why 5?
+     * Timeout for updating data. By default - 2
      */
-    protected float $requestTimeout = 5;
+    protected float $mappingDataUpdateTimeout = 2;
+
+    /**
+     * Request timeout in seconds. By default - 0.5
+     */
+    protected float $requestSaaSTimeout =  2;
 
     /**
      * Report timeout in seconds. By default - 0.5
@@ -48,6 +53,11 @@ class Config
      * TTL in seconds
      */
     protected int $mappingCacheTTL = 600;
+
+    /**
+     * Path to folder with local cache
+     */
+    protected string $cacheFolder;
 
     public function setClientApiKey(?string $clientApiKey): void
     {
@@ -115,19 +125,35 @@ class Config
     }
 
     /**
-     * $requestTimeout in seconds, can be float value
+     * SaaS request timeout in seconds, can be float value
      */
-    public function setRequestTimeout(float $requestTimeout): void
+    public function setRequestSaaSTimeout(float $requestTimeout): void
     {
-        $this->requestTimeout = $requestTimeout;
+        $this->requestSaaSTimeout = $requestTimeout;
     }
 
     /**
      * @return float
      */
-    public function getRequestTimeout(): float
+    public function getRequestSaaSTimeout(): float
     {
-        return $this->requestTimeout;
+        return $this->requestSaaSTimeout;
+    }
+
+    /**
+     * $requestTimeout in seconds, can be float value
+     */
+    public function setMappingDataUpdateTimeout(float $mappingDataUpdateTimeout): void
+    {
+        $this->requestSaaSTimeout = $mappingDataUpdateTimeout;
+    }
+
+    /**
+     * @return float
+     */
+    public function getMappingDataUpdateTimeout(): float
+    {
+        return $this->mappingDataUpdateTimeout;
     }
 
     /**
@@ -199,15 +225,24 @@ class Config
         return "https://" . ($this->stage === "qa" ? "qa-" : "") . "api.searchhub.io/modificationTime?tenant={$this->accountName}.{$this->channelName}";
     }
 
+//    private function createFolderForCache()
+//    {
+//        $this->cacheFolder = sys_get_temp_dir() . "/SearchHub-{$this->accountName}-{$this->channelName}-{$this->stage}/"
+//        if (!is_dir($this->cacheFolder)) {
+//            mkdir($this->cacheFolder, 0777, true);
+//            }
+//    }
+
     /**
      * @return string
      */
     public function getFileSystemCacheDirectory(): string
     {
         //TODO: should here be a folder "searchHub"?
-        //return "/tmp/cache/data/cache/";
+        //return $this->cacheFolder;
         return sys_get_temp_dir() . "/";
     }
+
 
     /**
      * Constructor for initializing an instance of a class.
@@ -231,5 +266,7 @@ class Config
         $this->setStage($stage);
         $this->setType($type);
         $this->setSaaSEndPoint($SaaSEndPoint);
+
+        //$this->createFolderForCache();
     }
 }
