@@ -18,10 +18,7 @@ class SQLCache implements MappingCacheInterface
 
     public function __construct(Config $config)
     {
-        //TODO: use sys_get_temp_dir (http://doc.php.sh/en/function.sys-get-temp-dir.html)
-        //      to write to temporary directory. otherwise this might write somewhere into the library path
-        // better use $config->getFileSystemCacheDirectory()   If folder -> easier name
-        $this->SQLName = $config->getFileSystemCacheDirectory() . "SearchHub.{$config->getAccountName()}.{$config->getChannelName()}.{$config->getStage()}.SQLCache.sqlite";
+        $this->SQLName = $config->getFileSystemCacheDirectory() . "SQLCache.sqlite";
         $this->db = new PDO("sqlite:$this->SQLName");
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 

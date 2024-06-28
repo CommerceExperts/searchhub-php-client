@@ -225,22 +225,20 @@ class Config
         return "https://" . ($this->stage === "qa" ? "qa-" : "") . "api.searchhub.io/modificationTime?tenant={$this->accountName}.{$this->channelName}";
     }
 
-//    private function createFolderForCache()
-//    {
-//        $this->cacheFolder = sys_get_temp_dir() . "/SearchHub-{$this->accountName}-{$this->channelName}-{$this->stage}/"
-//        if (!is_dir($this->cacheFolder)) {
-//            mkdir($this->cacheFolder, 0777, true);
-//            }
-//    }
+    private function createFolderForCache()
+    {
+        $this->cacheFolder = sys_get_temp_dir() . "/SearchHub-{$this->accountName}-{$this->channelName}-{$this->stage}/";
+        if (!is_dir($this->cacheFolder)) {
+            mkdir($this->cacheFolder, 0777, true);
+            }
+    }
 
     /**
      * @return string
      */
     public function getFileSystemCacheDirectory(): string
     {
-        //TODO: should here be a folder "searchHub"?
-        //return $this->cacheFolder;
-        return sys_get_temp_dir() . "/";
+        return $this->cacheFolder;
     }
 
 
@@ -267,6 +265,6 @@ class Config
         $this->setType($type);
         $this->setSaaSEndPoint($SaaSEndPoint);
 
-        //$this->createFolderForCache();
+        $this->createFolderForCache();
     }
 }
