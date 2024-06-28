@@ -40,7 +40,8 @@ class SaaSMapper implements SearchHubMapperInterface
     {
         if ($this->httpClient === null) {
             $this->httpClient = new Client([
-                'timeout' => (float)$timeOut ? $timeOut : $this->config->getRequestTimeout()]);
+                'timeout' => (float)($timeOut ?? $this->config->getRequestTimeout())
+            ]);
         }
         return $this->httpClient;
     }

@@ -35,14 +35,14 @@ class Config
     protected ?string $SaaSEndPoint=null;
 
     /**
-     * Request timeout in seconds. By default - //TODO seconds or milliseconds
+     * Request timeout in seconds. By default - 5//TODO by default? Why 5?
      */
-    protected float $requestTimeout = 10;
+    protected float $requestTimeout = 5;
 
     /**
-     * Report timeout in seconds. By default - 0.5 //TODO Why dont works with 0.01
+     * Report timeout in seconds. By default - 0.5
      */
-    protected float $reportTimeout = 0.01;
+    protected float $reportTimeout = 0.5;
 
     /**
      * TTL in seconds
@@ -204,8 +204,8 @@ class Config
      */
     public function getFileSystemCacheDirectory(): string
     {
-        // TODO: $cache->setFileSystemCacheDirectory($dir)
-        //return "/tmp/cache/data/cache/searchhub/{$this->accountName}/{$this->channelName}/{$this->stage}";
+        //TODO: should here be a folder "searchHub"?
+        //return "/tmp/cache/data/cache/";
         return sys_get_temp_dir() . "/";
     }
 
