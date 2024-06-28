@@ -8,7 +8,7 @@ interface MappingCacheInterface
      * Optimize Query by sending it to searchhub checking whether there is a better performing
      * variant of the same search
      *
-     * @return void
+     * @return QueryMapping
      */
     public function get(string $query): QueryMapping;
 

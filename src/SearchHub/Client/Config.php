@@ -42,7 +42,7 @@ class Config
     /**
      * Request timeout in seconds. By default - 0.5
      */
-    protected float $requestSaaSTimeout =  2;
+    protected float $requestSaaSTimeout =  0.5;
 
     /**
      * Report timeout in seconds. By default - 0.5
@@ -225,7 +225,7 @@ class Config
         return "https://" . ($this->stage === "qa" ? "qa-" : "") . "api.searchhub.io/modificationTime?tenant={$this->accountName}.{$this->channelName}";
     }
 
-    private function createFolderForCache()
+    private function createFolderForCache(): void
     {
         $this->cacheFolder = sys_get_temp_dir() . "/SearchHub-{$this->accountName}-{$this->channelName}-{$this->stage}/";
         if (!is_dir($this->cacheFolder)) {
