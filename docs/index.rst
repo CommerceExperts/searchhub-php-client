@@ -61,13 +61,13 @@ Requirements
 Composer Dependency
 -------------------
 
-The smartQueryPHP library can be added as a composer dependency `cxp/searchhub-php-client`.
+The smartQueryPHP library can be added as a composer dependency `commerce-experts/searchhub-php-client`.
 
 .. code-block:: json
 
    {
      "require": {
-       "cxp/searchhub-php-client": "1.0.0"
+       "commerce-experts/searchhub-php-client": "1.0.0"
      }
    }
 
