@@ -2,3 +2,4 @@
 /.idea/
 vendor/
 src/SearchHub/Client/API_KEY.php
+.phpunit.result.cache

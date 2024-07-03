@@ -20,14 +20,14 @@ class SearchHubClientTest extends TestCase
 
     public function setUp(): void
     {
-        $this->config = new Config( "test", "working", "qa", "SaaS", null, getenv('SH_API_KEY'));
+        $this->config = new Config( "test", "working", "qa", "saas", null, getenv('SH_API_KEY'));
     }
 
     public function testByPassQuery1()
     {
         //SaaS "vinil click" -> vinil click
 
-        $this->config->setType("SaaS");
+        $this->config->setType("saas");
 
         $query = "\"vinil click\"";
         $client = new SearchHubClient($this->config);
@@ -56,33 +56,26 @@ class SearchHubClientTest extends TestCase
         $query = "vinil click";
         $client = new SearchHubClient($this->config);
         $result = $client->mapQuery($query);
-        $expected = new QueryMapping("vinil click", "click-vinyl", null);
+        $expected = new QueryMapping($query, "click-vinyl", null);
 
         $this->assertEquals($expected, $result);
     }
 
     public function testSaaSMapperCustomURI()
     {
+        $configSaaSCustomURL = new Config("test", "working", "prod", "saas", "https://qa-saas.searchhub.io/smartquery/v2/test/working");
+        $query = "farrad";
+        $client = new SearchHubClient($configSaaSCustomURL);
+        $result = $client->mapQuery($query);
+        $expected = new QueryMapping($query, "fahrrad", "https://www.klapphill.de/");
 
-
-        $configSaaSCustomURL = new Config("test", "working", "qa", "saas",
-        "https://saas.searchhub.io/smartquery/v2/decathlon/de");
-        try {
-            $query = "farrad";
-            $client = new SearchHubClient($configSaaSCustomURL);
-            $result = $client->mapQuery($query);
-            $expected = new QueryMapping("farrad", "fahrrad", "https://www.decathlon.de/Fahrrad-Welt_lp-QSM56N");
-
-            $this->assertEquals($expected, $result);
-        } catch (\Exception $e) {
-            $this->markTestSkipped("Failed to connect to the server with custom uri: {$configSaaSCustomURL->getSaaSEndPoint()}");
-        }
+        $this->assertEquals($expected, $result);
     }
 
     public function testSaaSMapperCustomURI2()
     {
         // vinil click -> click-vinyl (SaaS mapper)
-
+        // with the custom endpoint, all other settings should be ignored
         $configSaaSCustomURL = new Config("test", "working", "qa", "saas",
             "https://saas.searchhub.io/smartquery/v2/demo/de");
 
@@ -97,6 +90,28 @@ class SearchHubClientTest extends TestCase
         } catch (\Exception $e) {
             $this->markTestSkipped("Failed to connect to the server with custom uri: {$configSaaSCustomURL->getSaaSEndPoint()}");
         }
+    }
+
+    public function testSaaSMappingOnlyWithRedirect()
+    {
+        $config = new Config("test", "working", "qa", "saas");
+        $query = "klaprad";
+        $client = new SearchHubClient($config);
+        $result = $client->mapQuery($query);
+        $expected = new QueryMapping($query, null, "https://www.klapphill.de/anmeldung");
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testLocalMappingOnlyWithRedirect()
+    {
+        $this->config->setType("local");
+        $query = "klaprad";
+        $client = new SearchHubClient($this->config);
+        $result = $client->mapQuery($query);
+        $expected = new QueryMapping($query, null, "https://www.klapphill.de/anmeldung");
+
+        $this->assertEquals($expected, $result);
     }
 
     public function testCacheEmptyAndYoung()

@@ -64,7 +64,7 @@ class LocalMapper implements SearchHubMapperInterface
         $response = $this->getHttpClient()->get($uri, ['headers' => ['apikey' => $this->config->getClientApiKey()]]);
         assert($response instanceof Response);
 
-        return (int)json_decode($response->getBody()->getContents(), true) / 1000;
+        return intval(json_decode($response->getBody()->getContents(), true) / 1000);
     }
 
     /**

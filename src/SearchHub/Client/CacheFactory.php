@@ -24,14 +24,16 @@ class CacheFactory
     {
        try
        {
-           //Try to connect to db
-           //throw new Exception("DB did´t connected");
-           return new SQLCache($this->config);
+            //Try to connect to db
+            //throw new Exception("DB did´t connected");
+            $cache = new SQLCache($this->config);
        }
        catch(Exception $e)
        {
             //If not connected to DB - use local Cache
-            return new FileMappingCache($this->config);
+            $cache = new FileMappingCache($this->config);
         }
+        //syslog(LOG_DEBUG, "Cache of type ".get_class($cache)." loaded. Last Modified Date = " . $cache->lastModifiedDate());
+        return $cache;
     }
 }
