@@ -193,10 +193,11 @@ class Config
 
     public function getSaaSEndpoint(string $userQuery=null): string
     {
+        $queryEncoded = urlencode($userQuery);
         if ($this->SaaSEndPoint === null){
-            return "https://" . ($this->stage === "qa" ? "qa-" : "") . "saas.searchhub.io/smartquery/v2/{$this->accountName}/{$this->channelName}?userQuery={$userQuery}";
+            return "https://" . ($this->stage === "qa" ? "qa-" : "") . "saas.searchhub.io/smartquery/v2/{$this->accountName}/{$this->channelName}?userQuery={$queryEncoded}";
         } else {
-            return $this->SaaSEndPoint ."?userQuery=". $userQuery;
+            return $this->SaaSEndPoint . "?userQuery=" . $queryEncoded;
         }
     }
 
