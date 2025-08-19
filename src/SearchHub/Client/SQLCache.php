@@ -52,12 +52,13 @@ class SQLCache implements MappingCacheInterface
     {
         // Start transaction
         $this->db->beginTransaction();
+        $this->deleteCache();
 
         foreach ($loadedCache as $query => $arr) {
             $masterQuery = $arr["masterQuery"];
             $redirect = $arr["redirect"];
 
-                $stmt = $this->db->prepare("
+            $stmt = $this->db->prepare("
                 INSERT OR IGNORE INTO queries (userQuery, masterQuery, redirect)
                 VALUES (:userQuery, :masterQuery, :redirect)
             ");
@@ -77,19 +78,22 @@ class SQLCache implements MappingCacheInterface
      */
     public function deleteCache(): void
     {
-        $result = $this->db->query("SELECT COUNT(*) FROM queries");
-        $rowCount = $result->fetchColumn();
-
+        $rowCount = $this->count();
         if ($rowCount > 0) {
             $this->db->exec("DELETE FROM queries");
         }
     }
 
-    public function isEmpty(): bool
+    public function count(): int
     {
         $result = $this->db->query("SELECT COUNT(*) as count FROM queries");
         $row = $result->fetch(PDO::FETCH_ASSOC);
-        return $row['count'] == 0;
+        return $row['count'];
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->count() == 0;
     }
 
     public function lastModifiedDate(): int
