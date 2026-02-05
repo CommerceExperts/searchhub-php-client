@@ -13,6 +13,9 @@ class SQLCacheTest extends TestCase
     public function testLoadingCache() : void
     {
         $config = new Config("sqltest", "01", "test", "local");
+        rmdir("temp");
+        mkdir("temp", 0777, true);
+        $config->setCacheBaseDirectory("temp");
         $underTest = new SQLCache($config);
 
         $mappingArray = array();
