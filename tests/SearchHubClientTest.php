@@ -21,6 +21,9 @@ class SearchHubClientTest extends TestCase
     public function setUp(): void
     {
         $this->config = new Config( "test", "working", "qa", "saas", null, getenv('SH_API_KEY'));
+        rmdir("temp"); // cleanup for every test case
+        mkdir("temp", 0777, true);
+        $this->config->setCacheBaseDirectory("temp");
     }
 
     public function testByPassQuery1()
